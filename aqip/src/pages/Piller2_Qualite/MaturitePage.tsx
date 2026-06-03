@@ -1,7 +1,6 @@
-import React from 'react';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPBadge from '../../components/ui/AQIPBadge';
-import { Target, ArrowRight, ShieldCheck, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ArrowRight, TrendingUp, AlertTriangle } from 'lucide-react';
 
 export default function MaturitePage() {
   const maturiteNiveaux = [

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AQIPCard from '../../components/ui/AQIPCard';
 import { BrainCircuit, Fingerprint, Users, ShieldCheck, Send, Sparkles } from 'lucide-react';
 import clsx from 'clsx';

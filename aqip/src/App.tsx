@@ -8,9 +8,7 @@ import CitizenJourneyPage from './pages/Piller5_Citoyen/CitizenJourneyPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import IAPage from './pages/Piller3_Intelligence/IAPage';
 import MaturitePage from './pages/Piller2_Qualite/MaturitePage';
-
-// Pages (à remplacer par de vrais composants par la suite)
-const MissionControlPlaceholder = () => <div className="p-6"><h1 className="text-2xl font-bold">Mission Control Replay</h1></div>;
+import MissionControlPage from './pages/Piller6_MissionControl/MissionControlPage';
 
 function App() {
   return (
@@ -25,7 +23,7 @@ function App() {
           <Route path="citoyen" element={<SatisfactionPage />} />
           <Route path="citoyen/journey" element={<CitizenJourneyPage />} />
           <Route path="ia" element={<IAPage />} />
-          <Route path="mission-control" element={<MissionControlPlaceholder />} />
+          <Route path="mission-control" element={<MissionControlPage />} />
         </Route>
       </Routes>
     </Router>
