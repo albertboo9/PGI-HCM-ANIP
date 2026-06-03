@@ -5,15 +5,17 @@ import {
   Users, 
   BrainCircuit, 
   PlayCircle,
-  Settings
+  Settings,
+  Target
 } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAVIGATION = [
-  { name: 'Dashboard DG', to: '/dashboard', icon: LayoutDashboard },
+  { name: 'Dashboard National', to: '/dashboard', icon: LayoutDashboard },
   { name: 'Journal Opérationnel', to: '/incidents', icon: AlertTriangle },
-  { name: 'Parcours Citoyen', to: '/citoyen', icon: Users },
-  { name: 'IA Experte ANIP', to: '/ia', icon: BrainCircuit },
+  { name: 'Modèle de Maturité', to: '/maturite', icon: Target },
+  { name: 'Expérience Citoyen', to: '/citoyen', icon: Users },
+  { name: 'Intelligence Artificielle', to: '/ia', icon: BrainCircuit },
   { name: 'Mission Control', to: '/mission-control', icon: PlayCircle },
 ];
 
