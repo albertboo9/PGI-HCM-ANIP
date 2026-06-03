@@ -1,0 +1,19 @@
+:root {
+  /* Mode sombre premium par défaut */
+  --aqip-bg-base: #0B0E1A;
+  --aqip-bg-surface: #111827;
+  --aqip-bg-elevated: #1F2937;
+  
+  --aqip-primary: #3B82F6;
+  --aqip-primary-dark: #1D4ED8;
+  
+  --aqip-accent: #10B981;
+  --aqip-warning: #F59E0B;
+  --aqip-danger: #EF4444;
+  --aqip-gold: #F59E0B;
+  
+  --aqip-text-primary: #F9FAFB;
+  --aqip-text-muted: #9CA3AF;
+  
+  --aqip-border: #1F2937;
+}

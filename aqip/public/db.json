@@ -1,0 +1,119 @@
+{
+  "agents": [
+    {
+      "id": "agt-001",
+      "nom": "Ahouangon",
+      "prenom": "Jean",
+      "matricule": "AGT-2024-0042",
+      "email": "j.ahouangon@anip.bj",
+      "telephone": "+229 61 23 45 67",
+      "poste": "Agent d'enrôlement",
+      "grade": "Catégorie B",
+      "centreId": "ctr-001",
+      "departementId": "dpt-001",
+      "dateEmbauche": "2022-03-15",
+      "statut": "actif",
+      "competences": [
+        { "competenceId": "comp-001", "niveauActuel": 4, "niveauAttendu": 5 },
+        { "competenceId": "comp-002", "niveauActuel": 2, "niveauAttendu": 4 }
+      ],
+      "scores": {
+        "performance": 92,
+        "qualite": 78,
+        "linguistique": 85,
+        "satisfaction": 4.3,
+        "composite": 86
+      }
+    }
+  ],
+  "centres": [
+    {
+      "id": "ctr-001",
+      "nom": "Cotonou Centre",
+      "departementId": "dpt-001",
+      "latitude": 6.3667,
+      "longitude": 2.4333,
+      "statut": "actif",
+      "maturite": "Contrôlé",
+      "agentsCount": 42
+    },
+    {
+      "id": "ctr-002",
+      "nom": "Natitingou Centre",
+      "departementId": "dpt-002",
+      "latitude": 10.3,
+      "longitude": 1.3833,
+      "statut": "alerte",
+      "maturite": "Réactif",
+      "agentsCount": 18
+    }
+  ],
+  "departements": [
+    {
+      "id": "dpt-001",
+      "nom": "Littoral",
+      "iqsp": 85
+    },
+    {
+      "id": "dpt-002",
+      "nom": "Atacora",
+      "iqsp": 62
+    }
+  ],
+  "incidents": [
+    {
+      "id": "inc-001",
+      "agentId": "agt-001",
+      "centreId": "ctr-001",
+      "dossierRef": "ENR-004582",
+      "citoyen": "Mme DOSSOU",
+      "categorie": "Saisie & Langue Française",
+      "codeErreur": "FR-01",
+      "erreurLibelle": "Faute d'orthographe sur le nom",
+      "valeurSaisie": "ADJOVY",
+      "valeurAttendue": "ADJOVI",
+      "gravite": "Haute",
+      "statut": "resolu",
+      "dateDetection": "2026-03-12T09:15:22Z",
+      "causeProbable": "Fatigue / Inattention",
+      "coutEstime": 4000,
+      "impact": "Doublon / Rejet de dossier"
+    },
+    {
+      "id": "inc-002",
+      "agentId": "agt-002",
+      "centreId": "ctr-002",
+      "dossierRef": "ENR-004583",
+      "categorie": "Biométrie",
+      "codeErreur": "BIO-03",
+      "erreurLibelle": "Empreintes incomplètes",
+      "gravite": "Critique",
+      "statut": "analyse",
+      "dateDetection": "2026-06-03T14:31:00Z",
+      "causeProbable": "Maîtrise insuffisante des réglages d'éclairage",
+      "coutEstime": 12000,
+      "impact": "Production bloquée"
+    }
+  ],
+  "satisfactions": [
+    {
+      "id": "sat-001",
+      "citoyen": "Mme DOSSOU",
+      "dossierRef": "ENR-004582",
+      "centreId": "ctr-001",
+      "service": "Demande NPI",
+      "note": 4,
+      "tempsAttenteMin": 45,
+      "commentaire": "Processus fluide mais temps d'attente un peu long au guichet biométrique.",
+      "date": "2026-04-10T10:00:00Z"
+    }
+  ],
+  "formations": [
+    {
+      "id": "fmt-001",
+      "titre": "Capture biométrique avancée",
+      "cout": 250000,
+      "competenceCiblee": "comp-002"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "./styles/aqip-theme.css";
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  
+  --color-aqip-bg-base: var(--aqip-bg-base);
+  --color-aqip-bg-surface: var(--aqip-bg-surface);
+  --color-aqip-bg-elevated: var(--aqip-bg-elevated);
+  
+  --color-aqip-primary: var(--aqip-primary);
+  --color-aqip-primary-dark: var(--aqip-primary-dark);
+  
+  --color-aqip-accent: var(--aqip-accent);
+  --color-aqip-warning: var(--aqip-warning);
+  --color-aqip-danger: var(--aqip-danger);
+  --color-aqip-gold: var(--aqip-gold);
+  
+  --color-aqip-text-primary: var(--aqip-text-primary);
+  --color-aqip-text-muted: var(--aqip-text-muted);
+  --color-aqip-border: var(--aqip-border);
+}
+
+@layer base {
+  body {
+    @apply bg-aqip-bg-base text-aqip-text-primary font-sans antialiased selection:bg-aqip-primary selection:text-white;
+    min-height: 100vh;
+  }
+}

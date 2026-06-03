@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCM-ANIP – Architecture Cible v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&family=Exo+2:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050a14;
+  --bg2: #080f1e;
+  --bg3: #0c1628;
+  --surface: rgba(12, 24, 48, 0.85);
+  --surface2: rgba(20, 40, 80, 0.6);
+  --border: rgba(0, 180, 255, 0.18);
+  --border2: rgba(0, 255, 180, 0.15);
+  --accent-blue: #00b4ff;
+  --accent-cyan: #00ffcc;
+  --accent-orange: #ff8c00;
+  --accent-purple: #9b59b6;
+  --accent-green: #00e676;
+  --accent-red: #ff4757;
+  --accent-yellow: #ffd700;
+  --text: #e0efff;
+  --text2: #7ab3d4;
+  --text3: #4a7a9b;
+  --glow-blue: 0 0 20px rgba(0, 180, 255, 0.4);
+  --glow-cyan: 0 0 20px rgba(0, 255, 204, 0.4);
+  --glow-orange: 0 0 20px rgba(255, 140, 0, 0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* PARTICLE CANVAS */
+#particles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* STORY OVERLAY */
+#story-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 10, 20, 0.95);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease;
+}
+#story-overlay.fade-out { opacity: 0; pointer-events: none; }
+
+.story-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-align: center;
+  letter-spacing: 0.08em;
+  text-shadow: var(--glow-blue);
+  margin-bottom: 1rem;
+  animation: glowPulse 2s ease infinite;
+}
+.story-subtitle {
+  font-size: 1rem;
+  color: var(--text2);
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.15em;
+  margin-bottom: 2.5rem;
+  opacity: 0.8;
+}
+.story-btn {
+  background: transparent;
+  border: 1.5px solid var(--accent-blue);
+  color: var(--accent-blue);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  padding: 0.85rem 2.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+.story-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  z-index: -1;
+}
+.story-btn:hover { color: var(--bg); }
+.story-btn:hover::before { transform: scaleX(1); }
+
+/* MAIN WRAPPER */
+.wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 1.5rem 4rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem;
+  position: relative;
+}
+.header-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.header-line::before, .header-line::after {
+  content: '';
+  flex: 1;
+  max-width: 200px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent-blue));
+}
+.header-line::after { background: linear-gradient(to left, transparent, var(--accent-blue)); }
+
+h1 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1.1rem, 2.5vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+h1 span { color: var(--accent-blue); }
+.header-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text3);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 0.4rem;
+}
+
+/* WORKFLOW STEPS BANNER */
+.workflow-banner {
+  display: flex;
+  gap: 0;
+  margin: 1.5rem 0 2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+}
+.workflow-banner::-webkit-scrollbar { display: none; }
+
+.wf-step {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-top: 2px solid transparent;
+}
+.wf-step.active { border-top-color: var(--accent-cyan); }
+.wf-step::after {
+  content: '▶';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  color: var(--text3);
+  z-index: 2;
+}
+.wf-step:last-child::after { display: none; }
+
+.wf-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  color: var(--text3);
+}
+.wf-step.active .wf-num {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 14px rgba(0,255,204,0.5);
+  background: rgba(0,255,204,0.08);
+}
+.wf-label {
+  font-size: 0.65rem;
+  text-align: center;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  transition: color 0.3s;
+}
+.wf-step.active .wf-label { color: var(--accent-cyan); }
+
+/* GRID LAYOUT */
+.arch-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 260px;
+  grid-template-rows: auto auto auto auto auto;
+  gap: 0.75rem;
+  position: relative;
+}
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(8px);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--accent-blue), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.card:hover::before { opacity: 1; }
+.card:hover { border-color: rgba(0, 180, 255, 0.35); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+
+.card.highlighted {
+  border-color: rgba(0, 255, 204, 0.4);
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.15);
+}
+.card.highlighted::before { opacity: 1; background: linear-gradient(to right, transparent, var(--accent-cyan), transparent); }
+
+.card-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.card-title .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  animation: blink 2s ease infinite;
+  flex-shrink: 0;
+}
+
+.card-body {
+  font-size: 0.72rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+/* PORTAIL UNIQUE - CENTER TOP */
+.portail-card {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, rgba(0, 50, 100, 0.7), rgba(0, 20, 60, 0.9));
+  border: 1px solid rgba(0, 180, 255, 0.4);
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+.portail-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0,180,255,0.05), transparent);
+  animation: sweep 3s ease infinite;
+}
+.portail-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  letter-spacing: 0.1em;
+  text-shadow: var(--glow-blue);
+}
+.portail-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text3); }
+
+.user-roles {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.role-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.role-item:hover { transform: scale(1.05); }
+.role-icon {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  background: var(--surface2);
+  transition: all 0.3s;
+}
+.role-item:hover .role-icon {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+  background: rgba(0,255,204,0.1);
+}
+.role-name {
+  font-size: 0.6rem;
+  text-align: center;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+}
+
+/* USERS ROW */
+.users-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.users-row .card { flex: 1; min-width: 160px; }
+
+/* SECURITY ROW */
+.security-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+/* API GATEWAY */
+.api-gateway {
+  background: linear-gradient(135deg, rgba(20, 10, 60, 0.9), rgba(10, 5, 40, 0.95));
+  border-color: rgba(155, 89, 182, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+}
+.api-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 20px rgba(155,89,182,0.5);
+}
+.api-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+.api-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid rgba(155,89,182,0.3);
+  border-radius: 3px;
+  color: var(--text3);
+}
+
+/* MIDDLE MAIN LAYOUT */
+.middle-layout {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 200px 1fr 220px;
+  gap: 0.75rem;
+}
+
+/* TRAITEMENT SERVICES */
+.traitement-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.9rem;
+}
+.section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.service-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.service-item::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+.service-item:hover::before { transform: scaleX(1); }
+.service-item:hover { transform: translateY(-2px); }
+
+.si-rabbit::before { background: var(--accent-orange); }
+.si-fastapi::before { background: var(--accent-green); }
+.si-dify::before { background: var(--accent-blue); }
+.si-n8n::before { background: var(--accent-purple); }
+
+.si-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--text3);
+  margin-bottom: 0.2rem;
+}
+.si-icon { font-size: 1.4rem; margin-bottom: 0.3rem; line-height: 1; }
+.si-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+.si-rabbit .si-name { color: var(--accent-orange); }
+.si-fastapi .si-name { color: var(--accent-green); }
+.si-dify .si-name { color: var(--accent-blue); }
+.si-n8n .si-name { color: var(--accent-purple); }
+
+.si-desc {
+  font-size: 0.58rem;
+  color: var(--text3);
+  line-height: 1.3;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* EVENT BUS */
+.event-bus {
+  margin-top: 0.6rem;
+  background: rgba(0, 30, 60, 0.8);
+  border: 1px solid rgba(0, 180, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+  position: relative;
+}
+.eb-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.eb-label strong { color: var(--accent-blue); display: block; font-size: 0.68rem; }
+.eb-flow {
+  flex: 1;
+  height: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.eb-packet {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px; height: 6px;
+  border-radius: 3px;
+  animation: flowPacket 2.5s linear infinite;
+  opacity: 0;
+}
+.eb-packet:nth-child(1) { background: var(--accent-blue); animation-delay: 0s; }
+.eb-packet:nth-child(2) { background: var(--accent-cyan); animation-delay: 0.8s; }
+.eb-packet:nth-child(3) { background: var(--accent-orange); animation-delay: 1.6s; }
+
+/* DATA PLATFORM */
+.data-platform {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 0.9rem;
+  margin-top: 0;
+  position: relative;
+}
+.data-platform::before {
+  content: 'PLATEFORME DE DONNÉES & IA';
+  position: absolute;
+  top: -0.6rem; left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 0.75rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--accent-cyan);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.data-item {
+  background: var(--bg3);
+  border: 1px solid rgba(0, 255, 204, 0.12);
+  border-radius: 5px;
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.data-item:hover {
+  border-color: rgba(0, 255, 204, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,255,204,0.1);
+}
+.data-icon { font-size: 1.3rem; margin-bottom: 0.3rem; }
+.data-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  letter-spacing: 0.06em;
+  margin-bottom: 0.15rem;
+}
+.data-tech { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--text3); }
+.data-desc { font-size: 0.57rem; color: var(--text3); margin-top: 0.2rem; line-height: 1.3; }
+
+/* AI PLATFORM */
+.ai-platform {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 240px;
+  gap: 0.6rem;
+  background: rgba(5, 15, 30, 0.9);
+  border: 1px solid rgba(0, 180, 255, 0.15);
+  border-radius: 6px;
+  padding: 0.9rem;
+  position: relative;
+}
+.ai-platform::before {
+  content: 'PLATEFORME IA – ENTRAÎNEMENT & INFÉRENCE';
+  position: absolute;
+  top: -0.6rem; left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 0.75rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--accent-blue);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.ai-item {
+  background: var(--bg3);
+  border: 1px solid rgba(0, 180, 255, 0.12);
+  border-radius: 5px;
+  padding: 0.65rem 0.6rem;
+}
+.ai-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.ai-body { font-size: 0.6rem; color: var(--text3); line-height: 1.5; font-family: 'IBM Plex Mono', monospace; }
+
+.llm-item {
+  background: linear-gradient(135deg, rgba(20,5,40,0.9), rgba(10,3,30,0.95));
+  border: 1px solid rgba(155, 89, 182, 0.35);
+  border-radius: 5px;
+  padding: 0.65rem 0.6rem;
+  position: relative;
+  overflow: hidden;
+}
+.llm-item::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: conic-gradient(transparent, rgba(155,89,182,0.08), transparent 30%);
+  animation: rotate 6s linear infinite;
+}
+.llm-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.08em;
+}
+.llm-badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  background: rgba(155,89,182,0.15);
+  border: 1px solid rgba(155,89,182,0.3);
+  border-radius: 3px;
+  padding: 0.1rem 0.4rem;
+  color: var(--accent-purple);
+  margin-bottom: 0.3rem;
+}
+
+/* INFRA */
+.infra-row {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, rgba(10, 20, 40, 0.95), rgba(5, 12, 30, 0.98));
+  border: 1px solid rgba(0, 180, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.infra-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  text-shadow: var(--glow-blue);
+}
+.infra-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+.infra-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.65rem;
+}
+.infra-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+.infra-name { font-family: 'Rajdhani', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--text2); margin-bottom: 0.25rem; }
+.infra-detail { font-size: 0.6rem; color: var(--text3); line-height: 1.4; font-family: 'IBM Plex Mono', monospace; }
+
+/* RIGHT COLUMN */
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* LEFT COLUMN */
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* TAGS */
+.tag {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 3px;
+  margin: 0.1rem 0.1rem 0.1rem 0;
+  border: 1px solid;
+}
+.tag-blue { color: var(--accent-blue); border-color: rgba(0,180,255,0.3); background: rgba(0,180,255,0.06); }
+.tag-green { color: var(--accent-green); border-color: rgba(0,230,118,0.3); background: rgba(0,230,118,0.06); }
+.tag-orange { color: var(--accent-orange); border-color: rgba(255,140,0,0.3); background: rgba(255,140,0,0.06); }
+.tag-cyan { color: var(--accent-cyan); border-color: rgba(0,255,204,0.3); background: rgba(0,255,204,0.06); }
+
+/* FLOW LEGEND */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  margin: 0.5rem 0 1rem;
+}
+.legend-item { display: flex; align-items: center; gap: 0.4rem; }
+.legend-line {
+  width: 30px; height: 2px;
+  border-radius: 1px;
+}
+.legend-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+/* ANIMATED FLOWS */
+.flow-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* TOOLTIP */
+.tooltip {
+  position: fixed;
+  background: rgba(8, 15, 35, 0.97);
+  border: 1px solid var(--accent-cyan);
+  border-radius: 5px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.68rem;
+  color: var(--text2);
+  max-width: 220px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  line-height: 1.5;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.tooltip.visible { opacity: 1; }
+.tooltip strong { color: var(--accent-cyan); display: block; margin-bottom: 0.3rem; font-size: 0.72rem; }
+
+/* SYSTEMS RIGHT SIDE */
+.systems-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.odoo-card {
+  background: linear-gradient(135deg, rgba(0, 40, 10, 0.8), rgba(0, 20, 5, 0.9));
+  border: 1px solid rgba(0, 230, 118, 0.25);
+}
+.odoo-card .card-title { color: var(--accent-green); }
+.odoo-card .card-title .dot { background: var(--accent-green); }
+
+.moodle-card {
+  background: linear-gradient(135deg, rgba(40, 20, 0, 0.8), rgba(20, 10, 0, 0.9));
+  border: 1px solid rgba(255, 140, 0, 0.25);
+}
+.moodle-card .card-title { color: var(--accent-orange); }
+.moodle-card .card-title .dot { background: var(--accent-orange); }
+
+/* MONITORING RIGHT */
+.monitoring-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.mon-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.mon-item:hover { border-color: rgba(0,180,255,0.3); background: rgba(0,180,255,0.05); }
+.mon-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: blink 2s ease infinite;
+}
+.mon-name { font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; font-weight: 600; color: var(--text2); }
+.mon-desc { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--text3); margin-left: auto; }
+
+/* BENEFICES */
+.benefices {
+  background: linear-gradient(135deg, rgba(0, 40, 80, 0.7), rgba(0, 20, 50, 0.9));
+  border: 1px solid rgba(0, 180, 255, 0.25);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+}
+.benefices-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+.ben-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.65rem;
+  color: var(--text2);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.ben-check { color: var(--accent-green); flex-shrink: 0; }
+
+/* DATA FLOW ANIMATION */
+.data-flow-viz {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 4px;
+  margin: 0.1rem 0;
+  overflow: visible;
+}
+
+/* STEP HIGHLIGHT */
+.step-highlight {
+  position: absolute;
+  inset: -4px;
+  border-radius: 8px;
+  border: 2px solid var(--accent-cyan);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+  box-shadow: 0 0 20px rgba(0,255,204,0.3);
+}
+.card.step-active .step-highlight { opacity: 1; }
+.card.step-active { z-index: 10; }
+
+/* CIRCULATION DES DONNÉES */
+.circulation-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.9rem;
+}
+.circ-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s;
+  cursor: default;
+}
+.circ-step.active-step {
+  background: rgba(0,255,204,0.06);
+  border: 1px solid rgba(0,255,204,0.2);
+}
+.circ-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--text3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  color: var(--text3);
+  transition: all 0.3s;
+}
+.circ-step.active-step .circ-num {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: rgba(0,255,204,0.1);
+  box-shadow: 0 0 10px rgba(0,255,204,0.4);
+}
+.circ-text { font-size: 0.6rem; color: var(--text3); line-height: 1.4; font-family: 'IBM Plex Mono', monospace; }
+.circ-step.active-step .circ-text { color: var(--text2); }
+
+/* SOURCES DE DONNÉES */
+.sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.source-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.4rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 0.62rem;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.source-item:hover { border-color: rgba(0,180,255,0.3); color: var(--text2); }
+.source-icon { font-size: 0.9rem; flex-shrink: 0; }
+
+/* GOVERNANCE */
+.gov-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.gov-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6rem;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 0.2rem 0;
+}
+.gov-bullet { color: var(--accent-yellow); }
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+.footer span { color: var(--accent-blue); }
+
+/* ANIMATIONS */
+@keyframes glowPulse {
+  0%, 100% { text-shadow: 0 0 20px rgba(0,180,255,0.4), 0 0 40px rgba(0,180,255,0.2); }
+  50% { text-shadow: 0 0 30px rgba(0,180,255,0.7), 0 0 60px rgba(0,180,255,0.35); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes flowPacket {
+  0% { left: -10%; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { left: 105%; opacity: 0; }
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(0, 255, 204, 0.2); }
+  50% { border-color: rgba(0, 255, 204, 0.6); box-shadow: 0 0 25px rgba(0,255,204,0.2); }
+}
+@keyframes scanline {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.float-anim { animation: float 4s ease-in-out infinite; }
+
+/* PULSE RING */
+.pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--accent-blue);
+  animation: pulseRing 2s ease infinite;
+  pointer-events: none;
+}
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* CONNECTOR LINES SVG */
+.connector-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(0,180,255,0.3); border-radius: 3px; }
+
+/* REVEAL ANIMATIONS */
+.reveal { opacity: 0; transform: translateY(15px); transition: all 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* PROGRESS BAR */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--accent-blue), var(--accent-cyan));
+  z-index: 999;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px var(--accent-blue);
+}
+
+/* STEP PANEL */
+#step-panel {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(8, 15, 35, 0.96);
+  border: 1px solid var(--accent-cyan);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,204,0.15);
+  max-width: 600px;
+  width: 90%;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+#step-panel.show { opacity: 1; }
+.sp-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-cyan);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  flex-shrink: 0;
+}
+.sp-content { flex: 1; }
+.sp-title { font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+.sp-desc { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--text3); line-height: 1.4; }
+
+/* GRID WRAPPER FOR MAIN CONTENT */
+.main-columns {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.core-systems-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* EXPORTS */
+.export-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.6rem;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.export-item:hover { border-color: rgba(0,180,255,0.3); color: var(--text2); }
+
+/* MINI STATUS */
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: blink 1.5s ease infinite;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress-bar" style="width:0%"></div>
+<canvas id="particles"></canvas>
+
+<!-- STORY INTRO OVERLAY -->
+<div id="story-overlay">
+  <div class="story-title">HCM-ANIP</div>
+  <div class="story-subtitle">Plateforme Nationale Intelligente · Architecture Cible v1.0</div>
+  <p style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:#4a7a9b;text-align:center;max-width:480px;line-height:1.7;margin-bottom:2rem">
+    Découvrez en temps réel comment les données circulent des applications métier jusqu'aux décisions stratégiques, à travers 7 étapes clés d'un workflow intelligent.
+  </p>
+  <button class="story-btn" onclick="startStory()">▶ DÉMARRER L'EXPÉRIENCE</button>
+</div>
+
+<!-- STEP PANEL -->
+<div id="step-panel">
+  <div class="sp-num" id="sp-num">1</div>
+  <div class="sp-content">
+    <div class="sp-title" id="sp-title">—</div>
+    <div class="sp-desc" id="sp-desc">—</div>
+  </div>
+</div>
+
+<div id="tooltip" class="tooltip"></div>
+
+<div class="wrapper">
+  <!-- HEADER -->
+  <div class="header reveal">
+    <div class="header-line">
+      <h1><span>HCM-ANIP</span> – Plateforme Nationale Intelligente de Pilotage du Capital Humain,<br>de la Performance et des Compétences</h1>
+    </div>
+    <div class="header-sub">Architecture Cible – Vision Globale et Circulation des Données</div>
+  </div>
+
+  <!-- WORKFLOW BANNER -->
+  <div class="workflow-banner reveal" id="wf-banner">
+    <div class="wf-step" data-step="1"><div class="wf-num">1</div><div class="wf-label">Apps Métier<br>Génèrent</div></div>
+    <div class="wf-step" data-step="2"><div class="wf-num">2</div><div class="wf-label">Collecte<br>RabbitMQ</div></div>
+    <div class="wf-step" data-step="3"><div class="wf-num">3</div><div class="wf-label">FastAPI<br>Traite</div></div>
+    <div class="wf-step" data-step="4"><div class="wf-num">4</div><div class="wf-label">IA RAG<br>Analyse</div></div>
+    <div class="wf-step" data-step="5"><div class="wf-num">5</div><div class="wf-label">n8n<br>Orchestre</div></div>
+    <div class="wf-step" data-step="6"><div class="wf-num">6</div><div class="wf-label">Metabase<br>Expose</div></div>
+    <div class="wf-step" data-step="7"><div class="wf-num">7</div><div class="wf-label">IA Apprend<br>en Continu</div></div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend reveal">
+    <div class="legend-item"><div class="legend-line" style="background:var(--accent-blue)"></div><div class="legend-label">Flux temps réel</div></div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--accent-orange);border-top:2px dashed var(--accent-orange);height:0"></div><div class="legend-label">Flux batch/planifié</div></div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--accent-cyan)"></div><div class="legend-label">Requêtes API</div></div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--text3);border-top:2px dashed var(--text3);height:0"></div><div class="legend-label">Données analytiques</div></div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--accent-orange);opacity:0.5"></div><div class="legend-label">Supervision/Monitoring</div></div>
+    <div class="legend-item" style="margin-left:auto">
+      <div class="status-dot"></div>
+      <div class="legend-label" style="color:var(--accent-green)">Système actif</div>
+    </div>
+  </div>
+
+  <!-- ROW 1: USER INTERFACES -->
+  <div class="card reveal" id="card-users" style="margin-bottom:0.75rem">
+    <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;justify-content:space-between">
+      <div>
+        <div class="card-title" style="margin-bottom:0.3rem;font-size:0.65rem;color:var(--text3)"><div class="dot" style="background:var(--text3)"></div>INTERFACES UTILISATEURS</div>
+      </div>
+      <div class="user-roles">
+        <div class="role-item" data-tooltip="Portail Agent – Learning / Auto-évaluation">
+          <div class="role-icon">👤</div><div class="role-name">Agents</div>
+        </div>
+        <div class="role-item" data-tooltip="Portail Manager – Suivi d'équipe / Tableaux de bord">
+          <div class="role-icon">👥</div><div class="role-name">Managers</div>
+        </div>
+        <div class="role-item" data-tooltip="Portail RH – Talent / Compétences / Budget">
+          <div class="role-icon">🏢</div><div class="role-name">DRH / RH</div>
+        </div>
+        <div class="role-item" data-tooltip="Portail DG – Pilotage stratégique / KPI">
+          <div class="role-icon">📊</div><div class="role-name">Direction</div>
+        </div>
+        <div class="role-item" data-tooltip="Systèmes institutionnels – API Externes">
+          <div class="role-icon">🌐</div><div class="role-name">API Ext.</div>
+        </div>
+      </div>
+    </div>
+    <div class="step-highlight"></div>
+  </div>
+
+  <!-- ROW 2: PORTAIL UNIQUE -->
+  <div class="portail-card reveal" id="card-portail" style="margin-bottom:0.75rem">
+    <div>
+      <div class="portail-label float-anim">⊕ PORTAIL UNIQUE – NEXT.JS (WEB)</div>
+      <div class="portail-sub">Interface unifiée · SSO · Responsive · Multi-rôles</div>
+    </div>
+    <div class="api-tags">
+      <span class="api-tag">JWT</span><span class="api-tag">OAuth2</span><span class="api-tag">i18n</span><span class="api-tag">PWA</span>
+    </div>
+    <div class="step-highlight"></div>
+  </div>
+
+  <!-- ROW 3: SECURITY -->
+  <div class="security-row reveal" style="margin-bottom:0.75rem" id="security-row">
+    <!-- Keycloak -->
+    <div class="card" id="card-keycloak" data-tooltip="IAM / SSO / MFA – Gestion des rôles & permissions">
+      <div class="card-title"><div class="dot"></div>Keycloak</div>
+      <div class="card-body">IAM / SSO / MFA<br><span class="tag tag-blue">Rôles</span><span class="tag tag-blue">Permissions</span></div>
+      <div class="step-highlight"></div>
+    </div>
+    <!-- API GATEWAY -->
+    <div class="card api-gateway" id="card-apigw">
+      <div class="api-title">⚡ API GATEWAY – KONG / APISIX</div>
+      <div class="api-tags">
+        <span class="api-tag">Sécurité</span><span class="api-tag">Routage</span><span class="api-tag">Rate Limiting</span><span class="api-tag">Transformation</span><span class="api-tag">Monitoring</span>
+      </div>
+      <div class="step-highlight"></div>
+    </div>
+    <!-- WAF -->
+    <div class="card" id="card-waf" data-tooltip="Web Application Firewall – Protection & Filtrage">
+      <div class="card-title" style="color:var(--accent-red)"><div class="dot" style="background:var(--accent-red)"></div>WAF / Pare-feu</div>
+      <div class="card-body">Protection & Filtrage<br><span class="tag tag-orange">DDoS</span><span class="tag tag-orange">OWASP</span></div>
+      <div class="step-highlight"></div>
+    </div>
+  </div>
+
+  <!-- MAIN 3-COLUMN LAYOUT -->
+  <div style="display:grid;grid-template-columns:210px 1fr 215px;gap:0.75rem" class="reveal">
+
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+      <!-- Sources de données -->
+      <div class="card" id="card-sources" style="animation:pulse-border 3s ease infinite">
+        <div class="card-title" style="color:var(--accent-orange)"><div class="dot" style="background:var(--accent-orange)"></div>Sources de Données</div>
+        <div class="card-body">
+          <div class="sources-list">
+            <div class="source-item" data-tooltip="Capture des changements de base de données en temps réel">🔄 <span>Debezium (CDC)</span></div>
+            <div class="source-item" data-tooltip="Collecte et parsing des logs applicatifs">📋 <span>Vector (Log Shipping)</span></div>
+            <div class="source-item" data-tooltip="Imports planifiés via fichiers et APIs">📁 <span>Fichiers / APIs</span></div>
+            <div class="source-item" data-tooltip="Application métier principale">⚙️ <span>App Métier 1</span></div>
+            <div class="source-item" data-tooltip="Données RH: enrôlement, état civil...">🏛️ <span>App Métier N</span></div>
+          </div>
+        </div>
+        <div class="step-highlight"></div>
+      </div>
+
+      <!-- Collecte non intrusive -->
+      <div class="card" id="card-collecte">
+        <div class="card-title" style="color:var(--accent-cyan)"><div class="dot" style="background:var(--accent-cyan)"></div>Collecte Non Intrusive</div>
+        <div class="card-body">
+          <span class="tag tag-cyan">CDC</span><span class="tag tag-cyan">Logs</span>
+          <div style="margin-top:0.4rem;font-size:0.6rem;color:var(--text3)">Envoi temps réel vers RabbitMQ sans impact métier</div>
+        </div>
+        <div class="step-highlight"></div>
+      </div>
+
+      <!-- Circulation des données -->
+      <div class="circulation-section" id="circulation-section">
+        <div class="section-title" style="color:var(--accent-cyan)">Circulation des Données</div>
+        <div id="circ-steps">
+          <div class="circ-step" data-circ="1">
+            <div class="circ-num">1</div>
+            <div class="circ-text">Apps métier génèrent événements (erreurs, actions, logs)</div>
+          </div>
+          <div class="circ-step" data-circ="2">
+            <div class="circ-num">2</div>
+            <div class="circ-text">Collecte CDC/logs → envoi temps réel RabbitMQ</div>
+          </div>
+          <div class="circ-step" data-circ="3">
+            <div class="circ-num">3</div>
+            <div class="circ-text">FastAPI traite, calcule scores, détecte anomalies</div>
+          </div>
+          <div class="circ-step" data-circ="4">
+            <div class="circ-num">4</div>
+            <div class="circ-text">IA (Dify+RAG) analyse contexte, identifie compétences</div>
+          </div>
+          <div class="circ-step" data-circ="5">
+            <div class="circ-num">5</div>
+            <div class="circ-text">n8n orchestre: inscription Moodle, notification, MAJ Odoo</div>
+          </div>
+          <div class="circ-step" data-circ="6">
+            <div class="circ-num">6</div>
+            <div class="circ-text">Données agrégées et exposées via Metabase pour pilotage</div>
+          </div>
+          <div class="circ-step" data-circ="7">
+            <div class="circ-num">7</div>
+            <div class="circ-text">Modèles IA apprennent en continu avec nouvelles données</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bénéfices -->
+      <div class="benefices">
+        <div class="benefices-title">✦ Bénéfices Clés</div>
+        <div class="ben-item"><span class="ben-check">✓</span>Pilotage intelligent des compétences</div>
+        <div class="ben-item"><span class="ben-check">✓</span>Réduction des erreurs récurrentes</div>
+        <div class="ben-item"><span class="ben-check">✓</span>Formation ciblée et mesurable</div>
+        <div class="ben-item"><span class="ben-check">✓</span>Optimisation budgétaire</div>
+        <div class="ben-item"><span class="ben-check">✓</span>Décisions basées sur la donnée</div>
+        <div class="ben-item"><span class="ben-check">✓</span>Souveraineté & sécurité nationale</div>
+      </div>
+    </div>
+
+    <!-- CENTER COLUMN -->
+    <div style="display:flex;flex-direction:column;gap:0.75rem">
+
+      <!-- TRAITEMENT & SERVICES MÉTIER -->
+      <div class="traitement-section" id="card-traitement">
+        <div class="section-title">Couche Traitement & Services Métier</div>
+        <div class="services-grid">
+          <div class="service-item si-rabbit" id="card-rabbit" data-tooltip="File d'attente d'événements – Tampon / Découplage – Haute disponibilité">
+            <div class="si-num">① Message Broker</div>
+            <div class="si-icon">🐰</div>
+            <div class="si-name">RabbitMQ</div>
+            <div class="si-desc">File d'attente · Tampon · Découplage</div>
+          </div>
+          <div class="service-item si-fastapi" id="card-fastapi" data-tooltip="Calcul des scores qualité – Règles métier / Détection – Exposition API">
+            <div class="si-num">② Moteur Scoring</div>
+            <div class="si-icon">⚡</div>
+            <div class="si-name">FastAPI</div>
+            <div class="si-desc">Scores qualité · Détection · API</div>
+          </div>
+          <div class="service-item si-dify" id="card-dify" data-tooltip="Classification intelligente – Recherche sémantique (RAG) – Compétences manquantes">
+            <div class="si-num">③ Moteur IA & RAG</div>
+            <div class="si-icon">🤖</div>
+            <div class="si-name">Dify + Qdrant</div>
+            <div class="si-desc">RAG · Sémantique · Compétences</div>
+          </div>
+          <div class="service-item si-n8n" id="card-n8n" data-tooltip="Workflows automatisés – Inscriptions formations – Notifications / Alertes">
+            <div class="si-num">④ Orchestrateur</div>
+            <div class="si-icon">🔗</div>
+            <div class="si-name">n8n</div>
+            <div class="si-desc">Workflows · Inscriptions · Alertes</div>
+          </div>
+        </div>
+        <div class="event-bus" id="card-eventbus">
+          <div class="eb-label">
+            <strong>Bus d'Événements</strong>
+            JSON/Avro · Schema Registry · Versioning
+          </div>
+          <div class="eb-flow">
+            <div class="eb-packet"></div>
+            <div class="eb-packet"></div>
+            <div class="eb-packet"></div>
+          </div>
+          <div style="font-size:0.6rem;color:var(--text3);font-family:'IBM Plex Mono',monospace;white-space:nowrap">Bus Interne</div>
+        </div>
+        <div class="step-highlight"></div>
+      </div>
+
+      <!-- DATA PLATFORM -->
+      <div class="data-platform" id="card-dataplatform">
+        <div class="data-item" id="card-datalake" data-tooltip="Stockage objets Brut & Historique – Données massives">
+          <div class="data-icon">🗄️</div>
+          <div class="data-name">Data Lake</div>
+          <div class="data-tech">MinIO / CEPh</div>
+          <div class="data-desc">Stockage objets Brut & Historique</div>
+        </div>
+        <div class="data-item" id="card-postgres" data-tooltip="Données transactionnelles – Services & Applications">
+          <div class="data-icon">🐘</div>
+          <div class="data-name">Bases Opéra.</div>
+          <div class="data-tech">PostgreSQL</div>
+          <div class="data-desc">Données transactionnelles</div>
+        </div>
+        <div class="data-item" id="card-feast" data-tooltip="Variables / Features pour modèles IA – Feature Engineering">
+          <div class="data-icon">🎯</div>
+          <div class="data-name">Feature Store</div>
+          <div class="data-tech">Feast</div>
+          <div class="data-desc">Variables pour modèles IA</div>
+        </div>
+        <div class="data-item" id="card-qdrant" data-tooltip="Embeddings – Documents & Connaissances vectorielles">
+          <div class="data-icon">🔮</div>
+          <div class="data-name">Vector Store</div>
+          <div class="data-tech">Qdrant</div>
+          <div class="data-desc">Embeddings · Documents</div>
+        </div>
+        <div class="data-item" id="card-mlflow" data-tooltip="Gestion des versions des modèles IA – Modèles & Artefacts">
+          <div class="data-icon">📦</div>
+          <div class="data-name">Model Registry</div>
+          <div class="data-tech">MLflow</div>
+          <div class="data-desc">Versions · Artefacts</div>
+        </div>
+      </div>
+
+      <!-- AI PLATFORM -->
+      <div class="ai-platform" id="card-aiplatform">
+        <div class="ai-item" id="card-entrainement">
+          <div class="ai-title">Entraînement</div>
+          <div class="ai-body">
+            🧪 Notebooks JupyterLab<br>
+            🐍 Pipelines ML (Python)<br>
+            ⚙️ AutoML / Hyperparamètres
+          </div>
+        </div>
+        <div class="ai-item" id="card-inference">
+          <div class="ai-title">Inférence</div>
+          <div class="ai-body">
+            🚀 API Models (FastAPI)<br>
+            Serving modèles IA<br>
+            <span class="tag tag-blue" style="margin-top:0.3rem">REST</span><span class="tag tag-green">gRPC</span>
+          </div>
+        </div>
+        <div class="ai-item" id="card-monitoring-ai">
+          <div class="ai-title">Monitoring IA</div>
+          <div class="ai-body">
+            📉 Drift · Performance · Biais<br>
+            🔔 Alertes & Explicabilité<br>
+            <span class="tag tag-orange">XAI</span><span class="tag tag-cyan">Evidently</span>
+          </div>
+        </div>
+        <div class="llm-item" id="card-llm">
+          <div class="llm-title">🧠 IA Générative Nationale</div>
+          <div class="llm-badge">À TERME</div>
+          <div class="ai-body" style="font-size:0.6rem">
+            LLM Local (Mistral / Llama)<br>
+            Fine-tuning continu<br>
+            Modèles métiers ANIP
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="systems-col">
+
+      <!-- SYSTÈMES CŒUR -->
+      <div class="card" style="border-color:rgba(0,255,100,0.2);background:rgba(0,20,8,0.8)">
+        <div class="card-title" style="font-size:0.65rem;color:var(--text3)"><div class="dot" style="background:var(--text3)"></div>SYSTÈMES CŒUR</div>
+        <!-- Odoo -->
+        <div class="card odoo-card" id="card-odoo" style="margin-bottom:0.5rem" data-tooltip="Référentiel central RH – Agents, postes, compétences – Évaluations, carrière, budget">
+          <div class="card-title"><div class="dot"></div>HCM/RH – Odoo Community</div>
+          <div class="card-body">
+            Référentiel central RH<br>
+            <span class="tag tag-green">Agents</span><span class="tag tag-green">Compétences</span><br>
+            <span class="tag tag-green">Carrière</span><span class="tag tag-green">Budget</span>
+          </div>
+          <div class="step-highlight"></div>
+        </div>
+        <!-- Moodle -->
+        <div class="card moodle-card" id="card-moodle" data-tooltip="Catalogue de cours – Parcours, quiz, certifications – Suivi apprentissages">
+          <div class="card-title"><div class="dot"></div>LMS / Formation – Moodle</div>
+          <div class="card-body">
+            Catalogue de cours<br>
+            <span class="tag tag-orange">Parcours</span><span class="tag tag-orange">Quiz</span><br>
+            <span class="tag tag-orange">Certifications</span>
+          </div>
+          <div class="step-highlight"></div>
+        </div>
+      </div>
+
+      <!-- CONSOMMATION ANALYTIQUE -->
+      <div class="card" id="card-metabase" data-tooltip="Tableaux de bord BI décisionnels – KPI temps réel – Rapports & Analyses">
+        <div class="card-title" style="color:var(--accent-yellow)"><div class="dot" style="background:var(--accent-yellow)"></div>Consommation Analytique</div>
+        <div class="card-body">
+          📊 <strong style="color:var(--text2)">Metabase</strong><br>
+          <span style="font-size:0.6rem">Tableaux de bord BI décisionnels</span><br>
+          <span class="tag tag-cyan">KPI temps réel</span><span class="tag tag-cyan">Rapports</span>
+        </div>
+        <div class="step-highlight"></div>
+      </div>
+
+      <!-- DATA WAREHOUSE -->
+      <div class="card" id="card-dwh" data-tooltip="Données agrégées – Historisation – Data Marts">
+        <div class="card-title" style="color:var(--accent-purple)"><div class="dot" style="background:var(--accent-purple)"></div>Data Warehouse</div>
+        <div class="card-body">
+          <span class="tag" style="color:var(--accent-purple);border-color:rgba(155,89,182,0.3)">PostgreSQL</span><span class="tag" style="color:var(--accent-purple);border-color:rgba(155,89,182,0.3)">ClickHouse</span><br>
+          <span style="font-size:0.6rem">Données agrégées · Historisation · Data Marts</span>
+        </div>
+      </div>
+
+      <!-- EXPORTS -->
+      <div class="card" id="card-exports">
+        <div class="card-title" style="color:var(--text2)"><div class="dot"></div>Exports & API</div>
+        <div>
+          <div class="export-item">🌐 Open Data</div>
+          <div class="export-item">🔒 Partage sécurisé</div>
+        </div>
+      </div>
+
+      <!-- OBSERVABILITÉ -->
+      <div class="card" id="card-obs">
+        <div class="card-title" style="color:var(--accent-red)"><div class="dot" style="background:var(--accent-red)"></div>Observabilité & Exploitation</div>
+        <div class="monitoring-items">
+          <div class="mon-item"><div class="mon-dot" style="background:#e6522c"></div><div class="mon-name">Prometheus</div><div class="mon-desc">Métriques</div></div>
+          <div class="mon-item"><div class="mon-dot" style="background:#f46800"></div><div class="mon-name">Grafana</div><div class="mon-desc">Dashboards</div></div>
+          <div class="mon-item"><div class="mon-dot" style="background:#ffdb4a"></div><div class="mon-name">Loki</div><div class="mon-desc">Logs</div></div>
+          <div class="mon-item"><div class="mon-dot" style="background:var(--accent-blue)"></div><div class="mon-name">Jaeger</div><div class="mon-desc">Traces</div></div>
+          <div class="mon-item"><div class="mon-dot" style="background:var(--accent-green)"></div><div class="mon-name">ELK/OpenSearch</div><div class="mon-desc">Recherche</div></div>
+        </div>
+      </div>
+
+      <!-- GOUVERNANCE -->
+      <div class="card">
+        <div class="card-title" style="color:var(--accent-yellow)"><div class="dot" style="background:var(--accent-yellow)"></div>Gouvernance & Conformité</div>
+        <div class="gov-list">
+          <div class="gov-item"><span class="gov-bullet">◆</span>Qualité des données</div>
+          <div class="gov-item"><span class="gov-bullet">◆</span>Catalogage & Métadonnées</div>
+          <div class="gov-item"><span class="gov-bullet">◆</span>RGPD & Protection données</div>
+          <div class="gov-item"><span class="gov-bullet">◆</span>Audit & Traçabilité</div>
+          <div class="gov-item"><span class="gov-bullet">◆</span>Politique de rétention</div>
+          <div class="gov-item"><span class="gov-bullet">◆</span>Gestion des accès & rôles</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INFRASTRUCTURE -->
+  <div class="infra-row reveal" style="margin-top:0.75rem" id="card-infra">
+    <div class="infra-title">🏗 INFRASTRUCTURE & HÉBERGEMENT (SOUVERAIN)</div>
+    <div class="infra-grid">
+      <div class="infra-item">
+        <div class="infra-icon">🏭</div>
+        <div class="infra-name">Centre de Données Principal (On-Premise)</div>
+        <div class="infra-detail">Kubernetes (K8s) · Réseau privé sécurisé<br>Stockage SAN / NAS · GPU Servers (IA/ML)</div>
+      </div>
+      <div class="infra-item">
+        <div class="infra-icon">☁️</div>
+        <div class="infra-name">Région de Secours (Backup)</div>
+        <div class="infra-detail">Réplication base de données<br>Sauvegardes & Snapshots · PRA / PCA</div>
+      </div>
+      <div class="infra-item">
+        <div class="infra-icon">🔐</div>
+        <div class="infra-name">Réseaux & Sécurité</div>
+        <div class="infra-detail">VPN / MPLS · Segmentation réseau<br>Zero Trust Architecture · Chiffrement</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer reveal">
+    Vers une <span>IA souveraine</span> au service du Capital Humain et de la Performance publique. &nbsp;·&nbsp; <span>HCM-ANIP – Architecture Cible v1.0</span>
+  </div>
+</div>
+
+<script>
+// ─── PARTICLES ───
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resizeCanvas() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+for (let i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * W, y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+    size: Math.random() * 1.5 + 0.5,
+    color: Math.random() > 0.6 ? '#00b4ff' : Math.random() > 0.5 ? '#00ffcc' : '#4a7a9b',
+    alpha: Math.random() * 0.5 + 0.1
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha;
+    ctx.fill();
+  });
+  // connections
+  particles.forEach((a, i) => {
+    particles.slice(i + 1).forEach(b => {
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d < 80) {
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = '#00b4ff';
+        ctx.globalAlpha = (1 - d / 80) * 0.08;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    });
+  });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ─── STORY STEPS ───
+const steps = [
+  { num: 1, title: 'Applications Métier → Événements', desc: 'Les applications (état civil, enrôlement, biométrie...) génèrent des événements en temps réel: erreurs, actions utilisateurs, logs.', cards: ['card-sources', 'card-users'] },
+  { num: 2, title: 'Collecte non intrusive → RabbitMQ', desc: 'Debezium capture les CDC, Vector ship les logs. Envoi temps réel vers RabbitMQ sans impacter les apps métier.', cards: ['card-collecte', 'card-rabbit'] },
+  { num: 3, title: 'FastAPI traite, score et détecte', desc: 'Le moteur de scoring FastAPI calcule les scores qualité, applique les règles métier et détecte les anomalies.', cards: ['card-fastapi', 'card-eventbus'] },
+  { num: 4, title: 'IA + RAG analyse le contexte', desc: 'Dify et Qdrant analysent intelligemment le contexte, identifient les compétences manquantes via recherche sémantique.', cards: ['card-dify', 'card-qdrant', 'card-aiplatform'] },
+  { num: 5, title: 'n8n orchestre les actions', desc: 'n8n déclenche les workflows: inscription automatique sur Moodle, notifications agents, mise à jour Odoo.', cards: ['card-n8n', 'card-odoo', 'card-moodle'] },
+  { num: 6, title: 'Metabase expose les données', desc: 'Les données sont agrégées dans le Data Warehouse et exposées via Metabase pour le pilotage stratégique.', cards: ['card-metabase', 'card-dwh', 'card-dataplatform'] },
+  { num: 7, title: 'IA apprend en continu', desc: 'Les modèles IA s\'améliorent avec les nouvelles données. MLflow gère les versions. Le LLM local ANIP sera enrichi.', cards: ['card-entrainement', 'card-mlflow', 'card-llm', 'card-monitoring-ai'] }
+];
+
+let currentStep = 0;
+let storyRunning = false;
+let storyInterval = null;
+
+function startStory() {
+  const overlay = document.getElementById('story-overlay');
+  overlay.classList.add('fade-out');
+  setTimeout(() => { overlay.style.display = 'none'; storyRunning = true; runStory(); }, 800);
+}
+
+function runStory() {
+  document.getElementById('step-panel').classList.add('show');
+  showStep(0);
+  storyInterval = setInterval(() => {
+    currentStep = (currentStep + 1) % steps.length;
+    showStep(currentStep);
+  }, 3800);
+}
+
+function showStep(i) {
+  const step = steps[i];
+  // Update panel
+  document.getElementById('sp-num').textContent = step.num;
+  document.getElementById('sp-title').textContent = step.title;
+  document.getElementById('sp-desc').textContent = step.desc;
+  // Update workflow banner
+  document.querySelectorAll('.wf-step').forEach((el, j) => {
+    el.classList.toggle('active', j === i);
+  });
+  // Update circulation steps
+  document.querySelectorAll('.circ-step').forEach(el => {
+    el.classList.toggle('active-step', parseInt(el.dataset.circ) === step.num);
+  });
+  // Highlight cards
+  document.querySelectorAll('.step-highlight').forEach(el => el.style.opacity = '0');
+  step.cards.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const hl = el.querySelector('.step-highlight');
+      if (hl) hl.style.opacity = '1';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+  // Update progress bar
+  document.getElementById('progress-bar').style.width = ((i + 1) / steps.length * 100) + '%';
+}
+
+// ─── REVEAL ON SCROLL ───
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.1 });
+revealEls.forEach(el => io.observe(el));
+
+// ─── TOOLTIPS ───
+const tooltip = document.getElementById('tooltip');
+document.querySelectorAll('[data-tooltip]').forEach(el => {
+  el.addEventListener('mouseenter', e => {
+    tooltip.innerHTML = `<strong>${el.querySelector('.card-title, .si-name, .role-name') ? (el.querySelector('.card-title')?.textContent.trim() || '') : ''}</strong>${el.dataset.tooltip}`;
+    tooltip.classList.add('visible');
+    positionTooltip(e);
+  });
+  el.addEventListener('mousemove', positionTooltip);
+  el.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+});
+function positionTooltip(e) {
+  const x = Math.min(e.clientX + 12, window.innerWidth - 240);
+  const y = Math.min(e.clientY + 12, window.innerHeight - 80);
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+// ─── WORKFLOW BANNER CLICK ───
+document.querySelectorAll('.wf-step').forEach((el, i) => {
+  el.addEventListener('click', () => {
+    clearInterval(storyInterval);
+    currentStep = i;
+    showStep(i);
+    storyInterval = setInterval(() => {
+      currentStep = (currentStep + 1) % steps.length;
+      showStep(currentStep);
+    }, 3800);
+  });
+});
+
+// ─── SERVICE ITEMS HOVER GLOW ───
+document.querySelectorAll('.service-item').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    document.querySelectorAll('.step-highlight').forEach(h => h.style.opacity = '0');
+    const hl = el.querySelector('.step-highlight');
+    if (hl) hl.style.opacity = '1';
+  });
+});
+
+// ─── DATA ITEMS HOVER ───
+document.querySelectorAll('.data-item, .mon-item').forEach(el => {
+  el.addEventListener('click', () => {
+    el.style.animation = 'none';
+    setTimeout(() => el.style.animation = '', 100);
+  });
+});
+</script>
+</body>
+</html>
