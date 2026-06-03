@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Incident } from '../types';
+import type { Incident } from '../types';
 
 interface IncidentState {
   incidents: Incident[];

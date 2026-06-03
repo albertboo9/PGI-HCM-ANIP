@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Centre, Departement } from '../types';
+import type { Centre, Departement } from '../types';
 
 interface CentreState {
   centres: Centre[];

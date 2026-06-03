@@ -10,7 +10,7 @@ interface AQIPStatCardProps {
   trend?: number;
   trendLabel?: string;
   className?: string;
-  color?: 'primary' | 'accent' | 'warning' | 'danger';
+  color?: 'primary' | 'accent' | 'warning' | 'danger' | 'success';
 }
 
 export default function AQIPStatCard({
@@ -27,7 +27,8 @@ export default function AQIPStatCard({
     primary: 'text-aqip-primary bg-aqip-primary/10 border-aqip-primary/20',
     accent: 'text-aqip-accent bg-aqip-accent/10 border-aqip-accent/20',
     warning: 'text-aqip-warning bg-aqip-warning/10 border-aqip-warning/20',
-    danger: 'text-aqip-danger bg-aqip-danger/10 border-aqip-danger/20'
+    danger: 'text-aqip-danger bg-aqip-danger/10 border-aqip-danger/20',
+    success: 'text-aqip-success bg-aqip-success/10 border-aqip-success/20'
   };
 
   return (

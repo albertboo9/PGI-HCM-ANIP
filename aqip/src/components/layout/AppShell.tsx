@@ -31,8 +31,8 @@ export default function AppShell() {
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col w-full min-w-0">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
-          <div className="mx-auto max-w-7xl h-full">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8 flex flex-col">
+          <div className="mx-auto max-w-7xl w-full flex-1 flex flex-col">
             <Outlet />
           </div>
         </main>

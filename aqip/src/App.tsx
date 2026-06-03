@@ -1,32 +1,101 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 
+// Dashboard (Router multi-personas)
+import DashboardPage from './pages/Dashboard/DashboardPage';
+
+// Pilier 1 : Référentiel
+import MetiersPage from './pages/Piller1_Referentiel/MetiersPage';
+import CompetencesPage from './pages/Piller1_Referentiel/CompetencesPage';
+import ProfilsPage from './pages/Piller1_Referentiel/ProfilsPage';
+import MatricePage from './pages/Piller1_Referentiel/MatricePage';
+
+// Pilier 2 : Qualité
 import IncidentsPage from './pages/Piller2_Qualite/IncidentsPage';
 import IncidentDetail from './pages/Piller2_Qualite/IncidentDetail';
-import SatisfactionPage from './pages/Piller5_Citoyen/SatisfactionPage';
-import CitizenJourneyPage from './pages/Piller5_Citoyen/CitizenJourneyPage';
-import DashboardPage from './pages/Dashboard/DashboardPage';
+import ErreursPage from './pages/Piller2_Qualite/ErreursPage';
+import CentresPage from './pages/Piller2_Qualite/CentresPage';
+import ObservatoireDonneesPage from './pages/Piller2_Qualite/ObservatoireDonneesPage';
+
+// Pilier 3 : Intelligence
 import IAPage from './pages/Piller3_Intelligence/IAPage';
+import ScoresPage from './pages/Piller3_Intelligence/ScoresPage';
+
+// Pilier 4 : Excellence
+import LMSPage from './pages/Piller4_Excellence/LMSPage';
+import CatalogueFormationsPage from './pages/Piller4_Excellence/CatalogueFormationsPage';
+import Feedback360Page from './pages/Piller4_Excellence/Feedback360Page';
+import CertificationsPage from './pages/Piller4_Excellence/CertificationsPage';
 import MaturitePage from './pages/Piller2_Qualite/MaturitePage';
+
+// Pilier 5 : Citoyen
+import CitizenJourneyPage from './pages/Piller5_Citoyen/CitizenJourneyPage';
+import SatisfactionPage from './pages/Piller5_Citoyen/SatisfactionPage';
+
+// Pilier 6 : Mission Control
 import MissionControlPage from './pages/Piller6_MissionControl/MissionControlPage';
+import CommandCenterPage from './pages/Piller6_MissionControl/CommandCenterPage';
+
+// Pilier 7 : Gouvernance
+import AuditPage from './pages/Piller7_Gouvernance/AuditPage';
+
+// Pilier 8 : RH & Finance
+import OrganigrammePage from './pages/Piller8_RH/OrganigrammePage';
+import TalentsPage from './pages/Piller8_RH/TalentsPage';
+
+// Workspace Agent
+import AgentWorkspacePage from './pages/Workspace/AgentWorkspacePage';
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<AppShell />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="workspace" element={<AgentWorkspacePage />} />
+          
+          {/* Pilier 1 */}
+          <Route path="referentiel/metiers" element={<MetiersPage />} />
+          <Route path="referentiel/competences" element={<CompetencesPage />} />
+          <Route path="referentiel/profils" element={<ProfilsPage />} />
+          <Route path="referentiel/matrice" element={<MatricePage />} />
+
+          {/* Pilier 2 */}
           <Route path="incidents" element={<IncidentsPage />} />
           <Route path="incidents/:id" element={<IncidentDetail />} />
-          <Route path="maturite" element={<MaturitePage />} />
-          <Route path="citoyen" element={<SatisfactionPage />} />
-          <Route path="citoyen/journey" element={<CitizenJourneyPage />} />
+          <Route path="qualite/erreurs" element={<ErreursPage />} />
+          <Route path="qualite/centres" element={<CentresPage />} />
+          <Route path="qualite/observatoire" element={<ObservatoireDonneesPage />} />
+
+          {/* Pilier 3 */}
           <Route path="ia" element={<IAPage />} />
+          <Route path="intelligence/scores" element={<ScoresPage />} />
+          
+          {/* Pilier 4 */}
+          <Route path="excellence/lms" element={<LMSPage />} />
+          <Route path="excellence/catalogue" element={<CatalogueFormationsPage />} />
+          <Route path="excellence/feedback" element={<Feedback360Page />} />
+          <Route path="excellence/certifications" element={<CertificationsPage />} />
+          <Route path="maturite" element={<MaturitePage />} />
+          
+          {/* Pilier 5 */}
+          <Route path="citoyen" element={<CitizenJourneyPage />} />
+          <Route path="satisfaction" element={<SatisfactionPage />} />
+          
+          {/* Pilier 6 */}
           <Route path="mission-control" element={<MissionControlPage />} />
+          <Route path="pilotage/command-center" element={<CommandCenterPage />} />
+          
+          {/* Pilier 7 */}
+          <Route path="gouvernance/audit" element={<AuditPage />} />
+          
+          {/* Pilier 8 */}
+          <Route path="rh/organigramme" element={<OrganigrammePage />} />
+          <Route path="rh/talents" element={<TalentsPage />} />
         </Route>
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 

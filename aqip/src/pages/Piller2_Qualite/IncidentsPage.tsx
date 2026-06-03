@@ -7,13 +7,13 @@ import { AlertTriangle, TrendingDown, DollarSign } from 'lucide-react';
 
 export default function IncidentsPage() {
   const navigate = useNavigate();
-  const { incidents, loading, fetchIncidents, getTotalNonQualityCost } = useIncidentStore();
+  const { incidents, isLoading, fetchIncidents, getTotalNonQualityCost } = useIncidentStore();
 
   useEffect(() => {
     fetchIncidents();
   }, [fetchIncidents]);
 
-  if (loading) return <div className="p-8 text-center text-aqip-text-muted">Chargement du journal opérationnel...</div>;
+  if (isLoading) return <div className="p-8 text-center text-aqip-text-muted">Chargement du journal opérationnel...</div>;
 
   return (
     <div className="space-y-6">
@@ -77,7 +77,7 @@ export default function IncidentsPage() {
                   onClick={() => navigate(`/incidents/${incident.id}`)}
                   className="hover:bg-aqip-bg-elevated/30 transition-colors cursor-pointer"
                 >
-                  <td className="px-6 py-4 font-medium text-white">{incident.dossierRef}</td>
+                  <td className="px-6 py-4 font-medium text-white">{incident.dossierRef || 'N/A'}</td>
                   <td className="px-6 py-4">
                     <div className="text-white">{incident.erreurLibelle}</div>
                     <div className="text-xs text-aqip-text-muted">{incident.categorie}</div>
@@ -89,7 +89,7 @@ export default function IncidentsPage() {
                     </AQIPBadge>
                   </td>
                   <td className="px-6 py-4 text-aqip-danger font-medium">
-                    -{incident.coutEstime.toLocaleString()} FCFA
+                    -{incident.coutEstime?.toLocaleString() || 0} FCFA
                   </td>
                   <td className="px-6 py-4">
                     <AQIPBadge variant={incident.statut === 'resolu' ? 'success' : incident.statut === 'analyse' ? 'warning' : 'default'}>

@@ -1,4 +1,5 @@
-import React, { ButtonHTMLAttributes } from 'react';
+import React from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 

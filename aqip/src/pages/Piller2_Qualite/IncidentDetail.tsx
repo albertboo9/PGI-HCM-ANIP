@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useIncidentStore, type Incident } from '../../store/incidentStore';
+import { useIncidentStore } from '../../store/incidentStore';
+import type { Incident } from '../../types';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPBadge from '../../components/ui/AQIPBadge';
 import { ArrowLeft, BrainCircuit, CheckCircle, Clock, Search, ShieldAlert, Sparkles, User, GraduationCap } from 'lucide-react';
@@ -44,7 +45,7 @@ export default function IncidentDetail() {
             </AQIPBadge>
           </div>
           <p className="text-sm text-aqip-text-muted mt-1">
-            Lié au dossier <strong>{incident.dossierRef}</strong> ({incident.citoyen})
+            Lié au dossier <strong>{incident.dossierRef || 'N/A'}</strong> ({incident.citoyen || 'N/A'})
           </p>
         </div>
       </div>
@@ -99,7 +100,7 @@ export default function IncidentDetail() {
               </div>
               <div className="pt-2 border-t border-aqip-border">
                 <div className="text-xs text-aqip-text-muted mb-1 uppercase tracking-wider">Impact Financier Estimé</div>
-                <div className="text-lg font-bold text-aqip-danger">-{incident.coutEstime.toLocaleString()} FCFA</div>
+                <div className="text-lg font-bold text-aqip-danger">-{incident.coutEstime?.toLocaleString() || 0} FCFA</div>
                 <div className="text-xs text-aqip-text-muted mt-1">Basé sur le temps de correction et la gêne occasionnée.</div>
               </div>
             </div>

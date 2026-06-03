@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UserCircle, ChevronDown, Check } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '../../store/authStore';

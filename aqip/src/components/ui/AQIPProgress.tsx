@@ -1,4 +1,3 @@
-import React from 'react';
 import clsx from 'clsx';
 
 interface AQIPProgressProps {
@@ -7,7 +6,7 @@ interface AQIPProgressProps {
   label?: string;
   showValue?: boolean;
   size?: 'sm' | 'md' | 'lg';
-  color?: 'primary' | 'accent' | 'warning' | 'danger';
+  color?: 'primary' | 'accent' | 'warning' | 'danger' | 'success';
   className?: string;
 }
 
@@ -26,7 +25,8 @@ export default function AQIPProgress({
     primary: 'bg-aqip-primary',
     accent: 'bg-aqip-accent',
     warning: 'bg-aqip-warning',
-    danger: 'bg-aqip-danger'
+    danger: 'bg-aqip-danger',
+    success: 'bg-aqip-success'
   };
 
   const sizes = {

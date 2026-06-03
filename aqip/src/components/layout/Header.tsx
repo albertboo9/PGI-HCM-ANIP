@@ -1,5 +1,6 @@
-import { Bell, Search, UserCircle, ChevronDown, Menu } from 'lucide-react';
+import { Bell, Search, Menu } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import RoleSwitcher from './RoleSwitcher';
 
 interface HeaderProps {
   onMenuClick?: () => void;

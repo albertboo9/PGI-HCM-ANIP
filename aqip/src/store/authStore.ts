@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Utilisateur } from '../types';
+import type { Utilisateur } from '../types';
 
 interface AuthState {
   currentUser: Utilisateur | null;
