@@ -1,45 +1,52 @@
 import { create } from 'zustand';
-
-export interface Incident {
-  id: string;
-  agentId: string;
-  centreId: string;
-  dossierRef: string;
-  citoyen: string;
-  categorie: string;
-  codeErreur: string;
-  erreurLibelle: string;
-  valeurSaisie?: string;
-  valeurAttendue?: string;
-  gravite: 'Faible' | 'Moyenne' | 'Haute' | 'Critique';
-  statut: 'nouveau' | 'analyse' | 'resolu';
-  dateDetection: string;
-  causeProbable?: string;
-  coutEstime: number;
-  impact: string;
-}
+import { Incident } from '../types';
 
 interface IncidentState {
   incidents: Incident[];
-  loading: boolean;
+  isLoading: boolean;
+  error: string | null;
   fetchIncidents: () => Promise<void>;
+  getIncidentById: (id: string) => Incident | undefined;
+  getIncidentsByAgent: (agentId: string) => Incident[];
+  addIncident: (incident: Incident) => void;
+  updateIncident: (id: string, updates: Partial<Incident>) => void;
   getTotalNonQualityCost: () => number;
 }
 
 export const useIncidentStore = create<IncidentState>((set, get) => ({
   incidents: [],
-  loading: false,
+  isLoading: false,
+  error: null,
+
   fetchIncidents: async () => {
-    set({ loading: true });
+    set({ isLoading: true, error: null });
     try {
       const response = await fetch('/db.json');
       const data = await response.json();
-      set({ incidents: data.incidents, loading: false });
+      set({ incidents: data.incidents, isLoading: false });
     } catch (error) {
-      console.error('Erreur lors du chargement des incidents', error);
-      set({ loading: false });
+      set({ error: 'Failed to fetch incidents', isLoading: false });
     }
   },
+
+  getIncidentById: (id) => {
+    return get().incidents.find(i => i.id === id);
+  },
+
+  getIncidentsByAgent: (agentId) => {
+    return get().incidents.filter(i => i.agentId === agentId);
+  },
+
+  addIncident: (incident) => set((state) => ({
+    incidents: [incident, ...state.incidents]
+  })),
+
+  updateIncident: (id, updates) => set((state) => ({
+    incidents: state.incidents.map(inc => 
+      inc.id === id ? { ...inc, ...updates } : inc
+    )
+  })),
+  
   getTotalNonQualityCost: () => {
     return get().incidents.reduce((total, inc) => total + (inc.coutEstime || 0), 0);
   }

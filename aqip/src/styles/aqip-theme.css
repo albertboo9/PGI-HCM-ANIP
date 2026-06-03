@@ -1,19 +1,82 @@
-:root {
-  /* Mode sombre premium par défaut */
+/* ============================================================
+   AQIP Design Tokens — Dual Theme System (Light + Dark)
+   ============================================================ */
+
+:root,
+[data-theme="light"] {
+  --aqip-bg-base: #F9FAFB;
+  --aqip-bg-surface: #FFFFFF;
+  --aqip-bg-elevated: #F3F4F6;
+
+  --aqip-primary: #2563EB;
+  --aqip-primary-dark: #1D4ED8;
+  --aqip-primary-light: #DBEAFE;
+
+  --aqip-accent: #059669;
+  --aqip-accent-light: #D1FAE5;
+  --aqip-warning: #D97706;
+  --aqip-warning-light: #FEF3C7;
+  --aqip-danger: #DC2626;
+  --aqip-danger-light: #FEE2E2;
+  --aqip-gold: #D97706;
+
+  --aqip-text-primary: #111827;
+  --aqip-text-secondary: #374151;
+  --aqip-text-muted: #6B7280;
+  --aqip-text-inverted: #FFFFFF;
+
+  --aqip-border: #E5E7EB;
+  --aqip-border-focus: #2563EB;
+
+  --aqip-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --aqip-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --aqip-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+  --aqip-sidebar-bg: #FFFFFF;
+  --aqip-sidebar-active-bg: #EFF6FF;
+  --aqip-sidebar-active-text: #2563EB;
+  --aqip-sidebar-hover-bg: #F3F4F6;
+
+  --aqip-header-bg: #FFFFFF;
+
+  --aqip-overlay: rgb(0 0 0 / 0.3);
+}
+
+[data-theme="dark"] {
   --aqip-bg-base: #0B0E1A;
   --aqip-bg-surface: #111827;
   --aqip-bg-elevated: #1F2937;
-  
+
   --aqip-primary: #3B82F6;
   --aqip-primary-dark: #1D4ED8;
-  
+  --aqip-primary-light: rgba(59, 130, 246, 0.15);
+
   --aqip-accent: #10B981;
+  --aqip-accent-light: rgba(16, 185, 129, 0.15);
   --aqip-warning: #F59E0B;
+  --aqip-warning-light: rgba(245, 158, 11, 0.15);
   --aqip-danger: #EF4444;
+  --aqip-danger-light: rgba(239, 68, 68, 0.15);
   --aqip-gold: #F59E0B;
-  
+
   --aqip-text-primary: #F9FAFB;
+  --aqip-text-secondary: #D1D5DB;
   --aqip-text-muted: #9CA3AF;
-  
+  --aqip-text-inverted: #111827;
+
   --aqip-border: #1F2937;
+  --aqip-border-focus: #3B82F6;
+
+  --aqip-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --aqip-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --aqip-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+
+  --aqip-sidebar-bg: #111827;
+  --aqip-sidebar-active-bg: rgba(59, 130, 246, 0.1);
+  --aqip-sidebar-active-text: #3B82F6;
+  --aqip-sidebar-hover-bg: #1F2937;
+
+  --aqip-header-bg: #111827;
+
+  --aqip-overlay: rgb(0 0 0 / 0.6);
 }

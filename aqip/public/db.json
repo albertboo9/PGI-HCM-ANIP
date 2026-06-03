@@ -11,18 +11,49 @@
       "grade": "Catégorie B",
       "centreId": "ctr-001",
       "departementId": "dpt-001",
+      "managerId": "mgr-001",
       "dateEmbauche": "2022-03-15",
       "statut": "actif",
       "competences": [
         { "competenceId": "comp-001", "niveauActuel": 4, "niveauAttendu": 5 },
-        { "competenceId": "comp-002", "niveauActuel": 2, "niveauAttendu": 4 }
+        { "competenceId": "comp-002", "niveauActuel": 2, "niveauAttendu": 4 },
+        { "competenceId": "comp-003", "niveauActuel": 5, "niveauAttendu": 5 }
       ],
       "scores": {
         "performance": 92,
         "qualite": 78,
         "linguistique": 85,
         "satisfaction": 4.3,
+        "potentiel": 88,
         "composite": 86
+      },
+      "historiqueMutations": [
+        { "date": "2023-06-01", "de": "Parakou", "vers": "Cotonou Centre", "motif": "Promotion" }
+      ]
+    },
+    {
+      "id": "agt-002",
+      "nom": "Dossou",
+      "prenom": "Blandine",
+      "matricule": "AGT-2024-0043",
+      "email": "b.dossou@anip.bj",
+      "telephone": "+229 62 00 00 01",
+      "poste": "Agent d'enrôlement",
+      "grade": "Catégorie B",
+      "centreId": "ctr-002",
+      "departementId": "dpt-002",
+      "dateEmbauche": "2023-01-10",
+      "statut": "actif",
+      "competences": [
+        { "competenceId": "comp-001", "niveauActuel": 3, "niveauAttendu": 5 }
+      ],
+      "scores": {
+        "performance": 80,
+        "qualite": 70,
+        "linguistique": 65,
+        "satisfaction": 4.0,
+        "potentiel": 85,
+        "composite": 75
       }
     }
   ],
@@ -31,10 +62,16 @@
       "id": "ctr-001",
       "nom": "Cotonou Centre",
       "departementId": "dpt-001",
+      "chefCentreId": "mgr-001",
+      "adresse": "01 BP 1234, Cotonou",
+      "telephone": "+229 21 33 45 67",
       "latitude": 6.3667,
       "longitude": 2.4333,
+      "dateOuverture": "2020-01-10",
       "statut": "actif",
       "maturite": "Contrôlé",
+      "equipements": ["BIO-347", "CAM-001", "LEC-089", "PC-012", "OND-003"],
+      "capaciteMax": 5000,
       "agentsCount": 42
     },
     {
@@ -46,18 +83,59 @@
       "statut": "alerte",
       "maturite": "Réactif",
       "agentsCount": 18
+    },
+    {
+      "id": "ctr-003",
+      "nom": "Parakou Centre",
+      "departementId": "dpt-003",
+      "latitude": 9.35,
+      "longitude": 2.6167,
+      "statut": "actif",
+      "maturite": "Standardisé",
+      "agentsCount": 25
+    },
+    {
+      "id": "ctr-004",
+      "nom": "Porto-Novo Centre",
+      "departementId": "dpt-004",
+      "latitude": 6.4969,
+      "longitude": 2.6289,
+      "statut": "actif",
+      "maturite": "Piloté",
+      "agentsCount": 35
     }
   ],
   "departements": [
+    { "id": "dpt-001", "nom": "Littoral", "chefLieu": "Cotonou", "iqsp": 85, "superficie": 79, "population": 1679356 },
+    { "id": "dpt-002", "nom": "Atacora", "chefLieu": "Natitingou", "iqsp": 62, "superficie": 31200, "population": 769337 },
+    { "id": "dpt-003", "nom": "Borgou", "chefLieu": "Parakou", "iqsp": 70, "superficie": 25856, "population": 1202095 },
+    { "id": "dpt-004", "nom": "Ouémé", "chefLieu": "Porto-Novo", "iqsp": 80, "superficie": 1281, "population": 1100404 }
+  ],
+  "utilisateurs": [
     {
-      "id": "dpt-001",
-      "nom": "Littoral",
-      "iqsp": 85
+      "id": "usr-001",
+      "nom": "Atangana",
+      "prenom": "Jean-Pierre",
+      "role": "dg",
+      "email": "jp.atangana@anip.bj",
+      "telephone": "+229 61 00 00 01",
+      "photo": "/assets/photos/dg.jpg"
     },
     {
-      "id": "dpt-002",
-      "nom": "Atacora",
-      "iqsp": 62
+      "id": "usr-002",
+      "nom": "Chabi",
+      "prenom": "Aminata",
+      "role": "drh",
+      "email": "a.chabi@anip.bj",
+      "telephone": "+229 61 00 00 02"
+    },
+    {
+      "id": "usr-003",
+      "nom": "Agossou",
+      "prenom": "Hervé",
+      "role": "chef_centre",
+      "email": "h.agossou@anip.bj",
+      "centreId": "ctr-001"
     }
   ],
   "incidents": [
@@ -65,8 +143,31 @@
       "id": "inc-001",
       "agentId": "agt-001",
       "centreId": "ctr-001",
-      "dossierRef": "ENR-004582",
-      "citoyen": "Mme DOSSOU",
+      "categorie": "Biométrie",
+      "codeErreur": "BIO-01",
+      "erreurLibelle": "Photo floue — visage mal éclairé",
+      "description": "Les photos prises ont été rejetées par l'AFIS à cause du contre-jour.",
+      "gravite": "Moyenne",
+      "statut": "analyse",
+      "dateDetection": "2026-03-12T09:15:22Z",
+      "dateResolution": null,
+      "causeProbable": "Maîtrise insuffisante des réglages d'éclairage",
+      "competenceImpactee": "comp-002",
+      "gapCompetence": 2,
+      "risque": "moyen",
+      "impact": "Retards de production estimés à 12h/semaine",
+      "formationPrescrite": "fmt-045",
+      "scoreConfianceIA": 92,
+      "historique": [
+        { "date": "2026-03-12T09:15:22Z", "action": "DÉTECTION", "user": "Système IA" },
+        { "date": "2026-03-12T09:20:00Z", "action": "NOTIFICATION", "user": "Système", "detail": "Chef de centre notifié" },
+        { "date": "2026-03-12T10:00:00Z", "action": "ANALYSE", "user": "IA", "detail": "Cause probable identifiée avec 92% de confiance" }
+      ]
+    },
+    {
+      "id": "inc-002",
+      "agentId": "agt-002",
+      "centreId": "ctr-002",
       "categorie": "Saisie & Langue Française",
       "codeErreur": "FR-01",
       "erreurLibelle": "Faute d'orthographe sur le nom",
@@ -74,46 +175,150 @@
       "valeurAttendue": "ADJOVI",
       "gravite": "Haute",
       "statut": "resolu",
-      "dateDetection": "2026-03-12T09:15:22Z",
+      "dateDetection": "2026-03-10T14:00:00Z",
       "causeProbable": "Fatigue / Inattention",
       "coutEstime": 4000,
       "impact": "Doublon / Rejet de dossier"
-    },
+    }
+  ],
+  "formations": [
     {
-      "id": "inc-002",
-      "agentId": "agt-002",
-      "centreId": "ctr-002",
-      "dossierRef": "ENR-004583",
-      "categorie": "Biométrie",
-      "codeErreur": "BIO-03",
-      "erreurLibelle": "Empreintes incomplètes",
-      "gravite": "Critique",
-      "statut": "analyse",
-      "dateDetection": "2026-06-03T14:31:00Z",
-      "causeProbable": "Maîtrise insuffisante des réglages d'éclairage",
-      "coutEstime": 12000,
-      "impact": "Production bloquée"
+      "id": "fmt-045",
+      "titre": "Capture biométrique avancée",
+      "categorie": "technique",
+      "duree": "3 jours",
+      "heures": 21,
+      "cout": 350000,
+      "certifiante": true,
+      "objectifs": ["Maîtriser éclairage studio", "Cadrage parfait", "Réglages caméra"],
+      "programme": "Jour 1: Théorie de la capture...",
+      "competencesCiblees": ["comp-002"],
+      "niveauCible": 4
+    }
+  ],
+  "formationsSuivies": [
+    {
+      "id": "fs-001",
+      "agentId": "agt-001",
+      "formationId": "fmt-045",
+      "statut": "en_cours",
+      "dateDebut": "2026-03-20",
+      "progression": 45,
+      "quizScore": 7,
+      "dateCertification": null
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "eval-001",
+      "agentId": "agt-001",
+      "evaluateurId": "usr-003",
+      "campagne": "2026-T1",
+      "date": "2026-03-01",
+      "statut": "verrouillee",
+      "scores": {
+        "comportemental": [
+          { "critereId": "b1", "label": "Leadership", "poids": 10, "note": 4 },
+          { "critereId": "b2", "label": "Communication", "poids": 10, "note": 5 }
+        ],
+        "technique": [],
+        "management": [],
+        "objectifs": [],
+        "autoEvaluation": []
+      },
+      "scoreFinal": 88,
+      "verrouilleeLe": "2026-03-05T14:00:00Z"
+    }
+  ],
+  "feedbacks": [
+    {
+      "id": "fb-001",
+      "agentId": "agt-001",
+      "emetteurId": "usr-003",
+      "relation": "manager",
+      "type": "positif",
+      "message": "Très bonne progression sur la biométrie globale malgré le récent incident.",
+      "note": 4,
+      "date": "2026-03-10",
+      "anonyme": false,
+      "vu": false
     }
   ],
   "satisfactions": [
     {
       "id": "sat-001",
-      "citoyen": "Mme DOSSOU",
-      "dossierRef": "ENR-004582",
       "centreId": "ctr-001",
-      "service": "Demande NPI",
+      "agentId": "agt-001",
+      "citoyen": "Mme DOSSOU",
       "note": 4,
-      "tempsAttenteMin": 45,
-      "commentaire": "Processus fluide mais temps d'attente un peu long au guichet biométrique.",
-      "date": "2026-04-10T10:00:00Z"
+      "commentaire": "Accueil chaleureux, service rapide",
+      "date": "2026-04-10",
+      "canal": "sms",
+      "typeService": "enrolement"
     }
   ],
-  "formations": [
+  "auditLogs": [
     {
-      "id": "fmt-001",
-      "titre": "Capture biométrique avancée",
-      "cout": 250000,
-      "competenceCiblee": "comp-002"
+      "id": "aud-001",
+      "agentId": "agt-001",
+      "action": "MODIFICATION_DOSSIER",
+      "cible": "DOS-2026-45821",
+      "ancienneValeur": "dateNaissance: 12/03/1999",
+      "nouvelleValeur": "dateNaissance: 13/03/1999",
+      "motif": "Erreur de saisie — faute de frappe",
+      "date": "2026-04-12T09:45:10Z",
+      "ip": "10.12.8.45"
     }
-  ]
+  ],
+  "competences": [
+    {
+      "id": "comp-001",
+      "nom": "Accueil et orientation citoyenne",
+      "categorie": "comportementale",
+      "piller": "accueil",
+      "description": "Savoir accueillir, écouter et diriger",
+      "niveaux": []
+    },
+    {
+      "id": "comp-002",
+      "nom": "Capture photo biométrique",
+      "categorie": "technique",
+      "piller": "enrolement",
+      "description": "Capacité à capturer et vérifier la qualité d'une photo d'identité biométrique",
+      "niveaux": [
+        { "niveau": 1, "label": "Débutant", "description": "A besoin de supervision" },
+        { "niveau": 2, "label": "Intermédiaire", "description": "Capture simple, erreurs fréquentes" },
+        { "niveau": 3, "label": "Avancé", "description": "Capture autonome, erreurs rares" },
+        { "niveau": 4, "label": "Expert", "description": "Capture parfaite, peut former" },
+        { "niveau": 5, "label": "Référent", "description": "Maîtrise totale, architecte processus" }
+      ]
+    }
+  ],
+  "pdI": [
+    {
+      "id": "pdi-001",
+      "agentId": "agt-001",
+      "annee": 2026,
+      "statut": "actif",
+      "objectifs": [
+        { "competenceId": "comp-002", "niveauCible": 4, "echeance": "2026-06-30", "statut": "en_cours" }
+      ],
+      "formationsPrescrites": ["fmt-045"],
+      "progressionGlobale": 35
+    }
+  ],
+  "budget": {
+    "annee": 2026,
+    "totalAlloue": 50000000,
+    "dejaEngage": 32000000,
+    "restant": 18000000,
+    "repartition": [
+      { "categorie": "Biométrie", "montant": 15000000, "consomme": 12000000 },
+      { "categorie": "État civil", "montant": 12000000, "consomme": 8000000 },
+      { "categorie": "Management", "montant": 10000000, "consomme": 6000000 }
+    ],
+    "roiParFormation": [
+      { "formationId": "fmt-045", "cout": 350000, "erreursEvitees": 120, "economieEstimee": 1200000, "roi": 342 }
+    ]
+  }
 }
