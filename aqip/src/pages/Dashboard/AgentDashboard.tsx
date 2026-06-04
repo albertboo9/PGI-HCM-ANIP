@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+
 import { Link } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPScoreRing from '../../components/ui/AQIPScoreRing';
@@ -12,16 +13,27 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { motion } from 'framer-motion';
 
 export default function AgentDashboard() {
-  const { incidents, fetchIncidents } = useIncidentStore();
   const { currentUser } = useAuthStore();
-  const { agents, fetchAgents, isLoading: agentsLoading } = useAgentStore();
+  const agents = useAgentStore(s => {
+    if (s.agents.length === 0) s.getAll();
+    return s.agents;
+  });
+  const incidents = useIncidentStore(s => {
+    if (s.incidents.length === 0) s.getAll();
+    return s.incidents;
+  });
 
-  const agentId = currentUser?.id || 'agt-001';
-
-  useEffect(() => {
-    fetchIncidents();
-    fetchAgents();
-  }, [fetchIncidents, fetchAgents]);
+  // Mapping: les utilisateurs (usr-xxx) sont liés aux agents (agt-xxx)
+  const userIdToAgentId: Record<string, string> = {
+    'usr-005': 'agt-001',
+    'usr-007': 'agt-006',
+    'usr-008': 'agt-002',
+    'usr-009': 'agt-007',
+    'usr-010': 'agt-004',
+    'usr-011': 'agt-005',
+    'usr-012': 'agt-003',
+  };
+  const agentId = userIdToAgentId[currentUser?.id || ''] || 'agt-001';
 
   const agent = agents.find(a => a.id === agentId);
   const agentIncidents = useMemo(() =>
@@ -41,7 +53,7 @@ export default function AgentDashboard() {
 
   const compositeScore = agent?.scores?.composite ?? 95;
 
-  if (agentsLoading && !agent) {
+  if (!agent) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <RefreshCw className="h-8 w-8 text-aqip-primary animate-spin" />

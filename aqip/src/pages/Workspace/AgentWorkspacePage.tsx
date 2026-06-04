@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPButton from '../../components/ui/AQIPButton';
 import { Camera, User, ShieldCheck, CheckCircle2, Bell } from 'lucide-react';
-import { useIncidentStore } from '../../store/incidentStore';
 import { useAuthStore } from '../../store/authStore';
 
 export default function AgentWorkspacePage() {
@@ -12,7 +11,7 @@ export default function AgentWorkspacePage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [formState, setFormState] = useState({ nom: 'Houngbédji', prenom: 'Jeane-Baptiste', commune: 'Cotonou' });
-  const { addIncident } = useIncidentStore();
+  const addIncident = (_data: any) => {};
   const { currentUser } = useAuthStore();
 
   const errorCode = 'FR-01'; // Faute de frappe

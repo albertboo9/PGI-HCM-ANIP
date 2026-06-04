@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useIncidentStore } from '../../store/incidentStore';
 import type { Incident } from '../../types';
@@ -9,12 +10,10 @@ import { ArrowLeft, BrainCircuit, CheckCircle, Clock, Search, ShieldAlert, Spark
 export default function IncidentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { incidents, fetchIncidents } = useIncidentStore();
+  const incidents = useIncidentStore(s => s.getAll());
   const [incident, setIncident] = useState<Incident | null>(null);
 
-  useEffect(() => {
-    if (incidents.length === 0) fetchIncidents();
-  }, [incidents.length, fetchIncidents]);
+  
 
   useEffect(() => {
     if (id && incidents.length > 0) {

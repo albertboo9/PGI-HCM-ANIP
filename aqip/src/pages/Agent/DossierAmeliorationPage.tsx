@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+
 import { useParams, Link } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPProgress from '../../components/ui/AQIPProgress';
@@ -18,13 +19,10 @@ const CANAL_CONFIG: Record<string, { label: string; icon: typeof Eye; color: str
 
 export default function DossierAmeliorationPage() {
   const { agentId } = useParams<{ agentId: string }>();
-  const { agents, fetchAgents } = useAgentStore();
-  const { incidents, fetchIncidents } = useIncidentStore();
+  const agents = useAgentStore(s => s.getAll());
+  const incidents = useIncidentStore(s => s.getAll());
 
-  useEffect(() => {
-    if (agents.length === 0) fetchAgents();
-    if (incidents.length === 0) fetchIncidents();
-  }, [agents.length, incidents.length, fetchAgents, fetchIncidents]);
+  
 
   const agent = agents.find(a => a.id === agentId);
   const agentIncidents = useMemo(

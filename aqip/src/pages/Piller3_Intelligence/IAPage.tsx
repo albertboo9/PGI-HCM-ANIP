@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+
 import AQIPCard from '../../components/ui/AQIPCard';
 import { Users, Send, Sparkles, BookOpen, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
@@ -18,13 +19,10 @@ export default function IAPage() {
   const [activeQuestion, setActiveQuestion] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   
-  const { agents, fetchAgents } = useAgentStore();
-  const { incidents, fetchIncidents } = useIncidentStore();
+  const agents = useAgentStore(s => s.getAll());
+  const incidents = useIncidentStore(s => s.getAll());
 
-  useEffect(() => {
-    if (agents.length === 0) fetchAgents();
-    if (incidents.length === 0) fetchIncidents();
-  }, [agents.length, incidents.length, fetchAgents, fetchIncidents]);
+  
 
   const priorityAgents = useMemo(() => getPriorityAgents(agents, incidents, 3), [agents, incidents]);
 

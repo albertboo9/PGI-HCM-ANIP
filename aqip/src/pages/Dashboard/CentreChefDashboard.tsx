@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+
 import { Link } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPScoreRing from '../../components/ui/AQIPScoreRing';
@@ -11,16 +12,13 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { motion } from 'framer-motion';
 
 export default function CentreChefDashboard() {
-  const { incidents, fetchIncidents } = useIncidentStore();
-  const { agents, fetchAgents } = useAgentStore();
+  const incidents = useIncidentStore(s => s.getAll());
+  const agents = useAgentStore(s => s.getAll());
   
   const [pdiProposed, setPdiProposed] = useState<string[]>([]);
   const centreId = 'ctr-001';
 
-  useEffect(() => {
-    fetchIncidents();
-    fetchAgents();
-  }, [fetchIncidents, fetchAgents]);
+  
 
   const centreAgents = useMemo(() => agents.filter(a => a.centreId === centreId), [agents, centreId]);
   const centreIncidents = useMemo(() => incidents.filter(i => i.centreId === centreId).sort((a, b) => new Date(b.dateDetection).getTime() - new Date(a.dateDetection).getTime()), [incidents, centreId]);
@@ -28,7 +26,7 @@ export default function CentreChefDashboard() {
   const teamGaps = useMemo(() => getPriorityAgents(centreAgents, centreIncidents, 10), [centreAgents, centreIncidents]);
 
   const handleProposePDI = (agentId: string) => {
-    setPdiProposed(prev => [...prev, agentId]);
+    setPdiProposed((prev: string[]) => [...prev, agentId]);
   };
 
   // Données mockées pour les graphiques

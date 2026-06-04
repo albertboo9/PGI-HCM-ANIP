@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPTable from '../../components/ui/AQIPTable';
 import { useCentreStore } from '../../store/centreStore';
@@ -6,11 +6,9 @@ import { MapPin, Search } from 'lucide-react';
 import AQIPButton from '../../components/ui/AQIPButton';
 
 export default function CentresPage() {
-  const { centres, fetchCentres, isLoading } = useCentreStore();
+  const centres = useCentreStore(s => s.getAll());
 
-  useEffect(() => {
-    fetchCentres();
-  }, [fetchCentres]);
+  
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -36,7 +34,7 @@ export default function CentresPage() {
         <AQIPTable
           data={centres}
           keyExtractor={(row) => row.id}
-          emptyMessage={isLoading ? "Chargement..." : "Aucun centre trouvé."}
+          emptyMessage={"Aucun centre trouvé."}
           columns={[
             { 
               header: 'Centre', 

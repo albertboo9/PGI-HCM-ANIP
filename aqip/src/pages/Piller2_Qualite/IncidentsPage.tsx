@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { useIncidentStore } from '../../store/incidentStore';
 import AQIPCard from '../../components/ui/AQIPCard';
@@ -7,13 +7,11 @@ import { AlertTriangle, TrendingDown, DollarSign } from 'lucide-react';
 
 export default function IncidentsPage() {
   const navigate = useNavigate();
-  const { incidents, isLoading, fetchIncidents, getTotalNonQualityCost } = useIncidentStore();
+  const incidents = useIncidentStore(s => s.getAll());
 
-  useEffect(() => {
-    fetchIncidents();
-  }, [fetchIncidents]);
+  
 
-  if (isLoading) return <div className="p-8 text-center text-aqip-text-muted">Chargement du journal opérationnel...</div>;
+  if (false) // <div className="p-8 text-center text-aqip-text-muted">Chargement du journal opérationnel...</div>;
 
   return (
     <div className="space-y-6">
@@ -39,7 +37,7 @@ export default function IncidentsPage() {
           </div>
           <div>
             <div className="text-sm font-medium text-aqip-text-muted">Coût de la Non-Qualité (30j)</div>
-            <div className="text-2xl font-bold text-white">{getTotalNonQualityCost().toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold text-white">{incidents.filter(i => i.coutEstime).reduce((s, i) => s + (i.coutEstime || 0), 0).toLocaleString()} FCFA</div>
           </div>
         </AQIPCard>
 

@@ -2,14 +2,12 @@ import AQIPCard from '../../components/ui/AQIPCard';
 import BeninMap from '../../components/maps/BeninMap';
 import { ShieldAlert, Activity } from 'lucide-react';
 import { useCentreStore } from '../../store/centreStore';
-import { useEffect } from 'react';
+
 
 export default function CommandCenterPage() {
-  const { centres, fetchCentres } = useCentreStore();
+  const centres = useCentreStore(s => s.getAll());
 
-  useEffect(() => {
-    if (centres.length === 0) fetchCentres();
-  }, [centres.length, fetchCentres]);
+  
 
   const mapData = centres.map(c => ({
     id: c.id,

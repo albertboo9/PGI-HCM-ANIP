@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+
 import { Link } from 'react-router-dom';
 import AQIPStatCard from '../../components/ui/AQIPStatCard';
 import AQIPCard from '../../components/ui/AQIPCard';
@@ -17,13 +18,10 @@ const BUDGET_LINES = [
 ];
 
 export default function DRHDashboard() {
-  const { agents, fetchAgents } = useAgentStore();
-  const { incidents, fetchIncidents } = useIncidentStore();
+  const agents = useAgentStore(s => s.getAll());
+  const incidents = useIncidentStore(s => s.getAll());
 
-  useEffect(() => {
-    if (agents.length === 0) fetchAgents();
-    if (incidents.length === 0) fetchIncidents();
-  }, [agents.length, incidents.length, fetchAgents, fetchIncidents]);
+  
 
   const priorityAgents = useMemo(() => getPriorityAgents(agents, incidents, 5), [agents, incidents]);
 
