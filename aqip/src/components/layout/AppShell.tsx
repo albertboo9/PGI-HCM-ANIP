@@ -25,7 +25,7 @@ export default function AppShell() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <Sidebar />
+        <Sidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
       {/* Main Content Area */}

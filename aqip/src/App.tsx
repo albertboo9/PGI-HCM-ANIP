@@ -46,6 +46,9 @@ import TalentsPage from './pages/Piller8_RH/TalentsPage';
 // Workspace Agent
 import AgentWorkspacePage from './pages/Workspace/AgentWorkspacePage';
 
+// Dossier Amélioration
+import DossierAmeliorationPage from './pages/Agent/DossierAmeliorationPage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -54,6 +57,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="workspace" element={<AgentWorkspacePage />} />
+          <Route path="agent/:agentId/dossier" element={<DossierAmeliorationPage />} />
           
           {/* Pilier 1 */}
           <Route path="referentiel/metiers" element={<MetiersPage />} />

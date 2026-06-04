@@ -1,16 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import AQIPStatCard from '../../components/ui/AQIPStatCard';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPProgress from '../../components/ui/AQIPProgress';
 import AQIPScoreRing from '../../components/ui/AQIPScoreRing';
-import { Users, GraduationCap, TrendingUp, AlertTriangle, DollarSign, Target } from 'lucide-react';
+import { Users, GraduationCap, AlertTriangle, DollarSign, Target, BookOpen, ArrowRight } from 'lucide-react';
 import { useAgentStore } from '../../store/agentStore';
-
-const TALENT_ALERTS = [
-  { name: 'Koffi Abena', role: "Agent d'enrôlement", region: 'Atacora', delta: -15, metric: 'Erreurs biométriques en hausse' },
-  { name: 'Mensah Kofi', role: 'Opérateur saisie', region: 'Littoral', delta: -22, metric: 'Fautes FR-01 récurrentes' },
-  { name: 'Adjovi Grâce', role: 'Superviseur', region: 'Ouémé', delta: -8, metric: 'NPS centre en baisse' },
-];
+import { useIncidentStore } from '../../store/incidentStore';
+import { getPriorityAgents } from '../../services/skillEngine';
 
 const BUDGET_LINES = [
   { label: 'Formations Techniques', used: 12_000_000, total: 18_000_000 },
@@ -21,10 +18,14 @@ const BUDGET_LINES = [
 
 export default function DRHDashboard() {
   const { agents, fetchAgents } = useAgentStore();
+  const { incidents, fetchIncidents } = useIncidentStore();
 
   useEffect(() => {
     if (agents.length === 0) fetchAgents();
-  }, [agents.length, fetchAgents]);
+    if (incidents.length === 0) fetchIncidents();
+  }, [agents.length, incidents.length, fetchAgents, fetchIncidents]);
+
+  const priorityAgents = useMemo(() => getPriorityAgents(agents, incidents, 5), [agents, incidents]);
 
   const totalBudgetUsed = BUDGET_LINES.reduce((s, b) => s + b.used, 0);
   const totalBudget = BUDGET_LINES.reduce((s, b) => s + b.total, 0);
@@ -32,30 +33,30 @@ export default function DRHDashboard() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h1 className="text-2xl font-bold text-aqip-text-primary tracking-tight">Dashboard RH Stratégique</h1>
-        <p className="text-sm text-aqip-text-muted mt-1">Pilotage des talents, compétences et budget de formation.</p>
+        <h1 className="text-2xl font-bold text-aqip-text-primary tracking-tight">Dashboard RH — Développement des Compétences</h1>
+        <p className="text-sm text-aqip-text-muted mt-1">Pilotage des talents, résorption des gaps et retour sur investissement des formations.</p>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AQIPStatCard title="Effectif Total" value={agents.length > 0 ? agents.length.toLocaleString() : '1,452'} icon={Users} trend={2.5} trendLabel="vs mois dernier" />
+        <AQIPStatCard title="Agents à Accompagner" value={priorityAgents.length.toString()} icon={Users} trend={-12} trendLabel="vs mois dernier" />
+        <AQIPStatCard title="Gaps Identifiés" value="48" icon={AlertTriangle} color="danger" trend={-5} trendLabel="vs mois dernier" />
+        <AQIPStatCard title="Formations Prescrites" value="89" icon={BookOpen} color="primary" />
         <AQIPStatCard title="Budget Consommé" value={`${Math.round(totalBudgetUsed / 1_000_000)}M`} icon={DollarSign} color="warning" />
-        <AQIPStatCard title="ROI Formation" value="342%" icon={TrendingUp} color="accent" trend={18} trendLabel="vs Q1" />
-        <AQIPStatCard title="Gaps Critiques" value="48" icon={AlertTriangle} color="danger" trend={-12} trendLabel="vs mois dernier" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Score IQSP RH */}
         <AQIPCard className="flex flex-col items-center justify-center bg-gradient-to-br from-aqip-bg-surface to-aqip-primary/5 p-6">
-          <AQIPScoreRing score={72} label="Score RH" size={140} strokeWidth={10} />
+          <AQIPScoreRing score={76} label="Couverture Gaps" size={140} strokeWidth={10} color="text-aqip-primary" />
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-center">
             <div>
-              <div className="text-xl font-bold text-aqip-text-primary">89%</div>
-              <div className="text-xs text-aqip-text-muted">Rétention</div>
+              <div className="text-xl font-bold text-aqip-text-primary">+26 pts</div>
+              <div className="text-xs text-aqip-text-muted">Amélioration Moy.</div>
             </div>
             <div>
-              <div className="text-xl font-bold text-aqip-text-primary">76%</div>
-              <div className="text-xs text-aqip-text-muted">Compétences</div>
+              <div className="text-xl font-bold text-aqip-text-primary">-65%</div>
+              <div className="text-xs text-aqip-text-muted">Erreurs post-PDI</div>
             </div>
           </div>
         </AQIPCard>
@@ -89,28 +90,37 @@ export default function DRHDashboard() {
       <AQIPCard>
         <h2 className="text-lg font-semibold text-aqip-text-primary flex items-center gap-2 mb-4">
           <Target className="h-5 w-5 text-aqip-danger" />
-          Alertes Compétences — Actions Requises
+          Agents Prioritaires — Plan de Développement Requis
         </h2>
         <div className="space-y-3">
-          {TALENT_ALERTS.map((alert) => (
-            <div key={alert.name} className="flex items-center justify-between p-4 bg-aqip-bg-elevated rounded-lg border border-aqip-border hover:border-aqip-danger/30 transition-colors">
+          {priorityAgents.map(({ agent, totalGap, topGap, incidentCount }) => (
+            <div key={agent.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-aqip-bg-elevated rounded-lg border border-aqip-border hover:border-aqip-primary/30 transition-colors gap-4">
               <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-aqip-danger/10 flex items-center justify-center text-aqip-danger font-bold text-sm">
-                  {alert.name.split(' ').map(n => n[0]).join('')}
+                <div className="h-10 w-10 rounded-full bg-aqip-danger/10 flex items-center justify-center text-aqip-danger font-bold text-sm shrink-0">
+                  {agent.prenom[0]}{agent.nom[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-aqip-text-primary">{alert.name} — <span className="text-aqip-text-muted">{alert.role}</span></p>
-                  <p className="text-xs text-aqip-text-muted">{alert.region} — {alert.metric}</p>
+                  <p className="text-sm font-medium text-aqip-text-primary">{agent.prenom} {agent.nom} — <span className="text-aqip-text-muted">{agent.poste}</span></p>
+                  <p className="text-xs text-aqip-text-muted mt-0.5">
+                    {incidentCount} incidents récents • Gap prioritaire : <span className="text-aqip-danger font-semibold">{topGap?.competenceLabel} (-{topGap?.gap} pts)</span>
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-bold text-aqip-danger">{alert.delta}%</span>
-                <button className="px-3 py-1.5 text-xs font-medium text-aqip-primary bg-aqip-primary/10 rounded-md hover:bg-aqip-primary/20 transition-colors">
-                  Prescrire PDI
-                </button>
+              <div className="flex items-center gap-4 sm:ml-auto">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-bold text-aqip-danger">Total Gap: {totalGap} pts</div>
+                </div>
+                <Link to={`/agent/${agent.id}/dossier`} className="px-4 py-2 text-xs font-medium text-white bg-aqip-primary rounded-md hover:bg-aqip-primary/90 transition-colors flex items-center gap-2">
+                  Ouvrir le Dossier <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </div>
           ))}
+          {priorityAgents.length === 0 && (
+            <div className="p-8 text-center text-aqip-text-muted text-sm border border-dashed border-aqip-border rounded-lg">
+              Aucun gap de compétence critique détecté actuellement.
+            </div>
+          )}
         </div>
       </AQIPCard>
     </div>

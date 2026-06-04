@@ -8,6 +8,7 @@ interface AQIPScoreRingProps {
   label?: string;
   className?: string;
   colorScale?: boolean;
+  color?: string;
 }
 
 export default function AQIPScoreRing({
@@ -17,15 +18,16 @@ export default function AQIPScoreRing({
   strokeWidth = 8,
   label,
   className,
-  colorScale = true
+  colorScale = true,
+  color
 }: AQIPScoreRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const percent = Math.max(0, Math.min(100, (score / maxScore) * 100));
   const offset = circumference - (percent / 100) * circumference;
 
-  let colorClass = 'text-aqip-primary';
-  if (colorScale) {
+  let colorClass = color || 'text-aqip-primary';
+  if (colorScale && !color) {
     if (percent >= 80) colorClass = 'text-aqip-accent';
     else if (percent >= 50) colorClass = 'text-aqip-warning';
     else colorClass = 'text-aqip-danger';
