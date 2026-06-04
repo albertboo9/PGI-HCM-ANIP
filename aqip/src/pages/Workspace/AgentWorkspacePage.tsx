@@ -2,168 +2,153 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPButton from '../../components/ui/AQIPButton';
-import { Camera, User, ShieldCheck, AlertTriangle, BookOpen, ArrowRight, ChevronDown } from 'lucide-react';
+import { Camera, User, ShieldCheck, CheckCircle2, Bell } from 'lucide-react';
 import { useIncidentStore } from '../../store/incidentStore';
 import { useAuthStore } from '../../store/authStore';
-import { getSkillMapping } from '../../data/skillMap';
-import type { CanalDetection } from '../../services/skillEngine';
-
-const CANAUX: { value: CanalDetection; label: string }[] = [
-  { value: 'controleur', label: 'Contrôleur Qualité' },
-  { value: 'chef_centre', label: 'Chef de Centre' },
-  { value: 'systeme', label: 'Système Automatique' },
-  { value: 'citoyen', label: 'Réclamation Citoyen' },
-];
 
 export default function AgentWorkspacePage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showResult, setShowResult] = useState(false);
-  const [canal, setCanal] = useState<CanalDetection>('controleur');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
   const [formState, setFormState] = useState({ nom: 'Houngbédji', prenom: 'Jeane-Baptiste', commune: 'Cotonou' });
   const { addIncident } = useIncidentStore();
   const { currentUser } = useAuthStore();
 
-  const errorCode = 'FR-01';
-  const mapping = getSkillMapping(errorCode);
+  const errorCode = 'FR-01'; // Faute de frappe
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // 1. Sauvegarde "réussie" (Temps réel)
     setTimeout(() => {
       setIsSubmitting(false);
-      setShowResult(true);
+      setIsSuccess(true);
+      
+      // Reset form visually
+      setFormState({ nom: '', prenom: '', commune: '' });
 
-      addIncident({
-        id: `INC-SIM-${Date.now()}`,
-        categorie: 'Saisie & Langue Française',
-        codeErreur: errorCode,
-        erreurLibelle: `Prénom erroné — "${formState.prenom}" (probable: "Jean-Baptiste")`,
-        description: "Erreur de transcription détectée lors de la saisie RAVIP.",
-        gravite: 'Haute',
-        statut: 'nouveau',
-        dateDetection: new Date().toISOString(),
-        centreId: 'ctr-001',
-        agentId: currentUser?.id || 'agt-001',
-        coutEstime: 4000,
-        canalDetection: canal,
-      } as any);
-    }, 1200);
+      // 2. Simulation Asynchrone : Détection a posteriori (Contrôle Qualité)
+      setTimeout(() => {
+        setIsSuccess(false);
+        setShowNotification(true);
+        
+        // This is now a real API POST call to JSON-server
+        addIncident({
+          id: `INC-SIM-${Date.now()}`,
+          categorie: 'Saisie & Langue Française',
+          codeErreur: errorCode,
+          erreurLibelle: `Prénom erroné — "Jeane-Baptiste" (Faute orthographe)`,
+          description: "Erreur de transcription détectée lors du contrôle qualité différé.",
+          gravite: 'Haute',
+          statut: 'nouveau',
+          dateDetection: new Date().toISOString(),
+          centreId: 'ctr-001',
+          agentId: currentUser?.id || 'agt-001',
+          coutEstime: 4000,
+          canalDetection: 'controleur',
+        } as any);
+
+        // Hide notification after 8s
+        setTimeout(() => setShowNotification(false), 8000);
+      }, 4000); // 4 secondes après la saisie
+    }, 800);
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto relative">
       <div>
         <h1 className="text-2xl font-bold text-aqip-text-primary tracking-tight">Outil d'Enrôlement RAVIP</h1>
-        <p className="text-sm text-aqip-text-muted mt-1">Saisie des données citoyens. Surveillance qualité active.</p>
+        <p className="text-sm text-aqip-text-muted mt-1">Saisie des données citoyens. (Simulation HCM Asynchrone vers Base de Données)</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <AQIPCard className="md:col-span-2">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <h2 className="text-lg font-semibold text-aqip-text-primary flex items-center gap-2 border-b border-aqip-border pb-3">
-              <User className="h-5 w-5 text-aqip-primary" /> Informations Civiles
-            </h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-aqip-text-muted">Nom de famille</label>
-                <input type="text" value={formState.nom} onChange={e => setFormState({ ...formState, nom: e.target.value })} className="w-full px-3 py-2 bg-aqip-bg-surface border border-aqip-border rounded-md text-sm focus:border-aqip-primary outline-none text-white" />
+        <AQIPCard className="md:col-span-2 shadow-[var(--aqip-shadow-md)]">
+          {isSuccess ? (
+            <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
+              <div className="h-16 w-16 bg-aqip-accent/10 rounded-full flex items-center justify-center">
+                <CheckCircle2 className="h-8 w-8 text-aqip-accent" />
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-aqip-text-muted">Prénoms</label>
-                <div className="relative">
-                  <input type="text" value={formState.prenom} onChange={e => setFormState({ ...formState, prenom: e.target.value })} className="w-full px-3 py-2 bg-aqip-bg-surface border-2 border-aqip-danger/50 rounded-md text-sm outline-none text-white" />
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                    <span className="flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-aqip-primary opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-aqip-primary"></span></span>
-                  </div>
+              <div>
+                <h3 className="text-lg font-bold text-aqip-text-primary">Dossier Enregistré</h3>
+                <p className="text-sm text-aqip-text-muted mt-1">Le dossier a été transmis avec succès pour production.</p>
+              </div>
+              <AQIPButton onClick={() => setIsSuccess(false)} variant="outline" className="mt-4">
+                Saisir un nouveau dossier
+              </AQIPButton>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h2 className="text-lg font-semibold text-aqip-text-primary flex items-center gap-2 border-b border-aqip-border pb-3">
+                <User className="h-5 w-5 text-aqip-primary" /> Informations Civiles
+              </h2>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-aqip-text-muted">Nom de famille</label>
+                  <input type="text" value={formState.nom} onChange={e => setFormState({ ...formState, nom: e.target.value })} className="w-full px-3 py-2.5 bg-aqip-bg-surface border border-aqip-border rounded-lg text-sm focus:border-aqip-primary focus:ring-1 focus:ring-aqip-primary outline-none text-aqip-text-primary shadow-sm transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-aqip-text-muted">Prénoms</label>
+                  <input type="text" value={formState.prenom} onChange={e => setFormState({ ...formState, prenom: e.target.value })} className="w-full px-3 py-2.5 bg-aqip-bg-surface border border-aqip-border rounded-lg text-sm focus:border-aqip-primary focus:ring-1 focus:ring-aqip-primary outline-none text-aqip-text-primary shadow-sm transition-all" />
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-aqip-text-muted">Commune de naissance</label>
-              <input type="text" value={formState.commune} onChange={e => setFormState({ ...formState, commune: e.target.value })} className="w-full px-3 py-2 bg-aqip-bg-surface border border-aqip-border rounded-md text-sm focus:border-aqip-primary outline-none text-white" />
-            </div>
-
-            <h2 className="text-lg font-semibold text-aqip-text-primary flex items-center gap-2 border-b border-aqip-border pb-3 pt-2">
-              <Camera className="h-5 w-5 text-aqip-primary" /> Capture Biométrique
-            </h2>
-            <div className="flex gap-4">
-              <div className="h-28 w-28 border-2 border-dashed border-aqip-border rounded-lg flex flex-col items-center justify-center text-aqip-text-muted bg-aqip-bg-surface cursor-pointer hover:border-aqip-primary transition-colors">
-                <Camera className="h-7 w-7 mb-1" /><span className="text-xs">Photo</span>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-aqip-text-muted">Commune de naissance</label>
+                <input type="text" value={formState.commune} onChange={e => setFormState({ ...formState, commune: e.target.value })} className="w-full px-3 py-2.5 bg-aqip-bg-surface border border-aqip-border rounded-lg text-sm focus:border-aqip-primary focus:ring-1 focus:ring-aqip-primary outline-none text-aqip-text-primary shadow-sm transition-all" />
               </div>
-              <div className="flex-1 border-2 border-dashed border-aqip-border rounded-lg flex flex-col items-center justify-center text-aqip-text-muted bg-aqip-bg-surface cursor-pointer hover:border-aqip-primary transition-colors">
-                <ShieldCheck className="h-7 w-7 mb-1" /><span className="text-xs">Empreintes (Qualité: 92%)</span>
-              </div>
-            </div>
 
-            <div className="pt-4 flex justify-end">
-              <AQIPButton type="submit" isLoading={isSubmitting}>Valider & Enregistrer</AQIPButton>
-            </div>
-          </form>
+              <h2 className="text-lg font-semibold text-aqip-text-primary flex items-center gap-2 border-b border-aqip-border pb-3 pt-2">
+                <Camera className="h-5 w-5 text-aqip-primary" /> Capture Biométrique
+              </h2>
+              <div className="flex gap-4">
+                <div className="h-28 w-28 border-2 border-dashed border-aqip-border rounded-xl flex flex-col items-center justify-center text-aqip-text-muted bg-aqip-bg-elevated cursor-pointer hover:border-aqip-primary hover:text-aqip-primary transition-colors">
+                  <Camera className="h-7 w-7 mb-1" /><span className="text-xs font-medium">Photo</span>
+                </div>
+                <div className="flex-1 border-2 border-dashed border-aqip-border rounded-xl flex flex-col items-center justify-center text-aqip-text-muted bg-aqip-bg-elevated cursor-pointer hover:border-aqip-primary hover:text-aqip-primary transition-colors">
+                  <ShieldCheck className="h-7 w-7 mb-1" /><span className="text-xs font-medium">Empreintes (Simulées OK)</span>
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <AQIPButton type="submit" isLoading={isSubmitting}>Valider & Enregistrer</AQIPButton>
+              </div>
+            </form>
+          )}
         </AQIPCard>
 
-        <AQIPCard className="bg-gradient-to-br from-aqip-bg-surface to-aqip-primary/5 border-aqip-primary/30 h-fit">
+        <AQIPCard className="bg-aqip-bg-surface border-aqip-border h-fit shadow-[var(--aqip-shadow-sm)]">
           <h3 className="font-semibold text-aqip-text-primary flex items-center gap-2 mb-3">
-            <ShieldCheck className="h-5 w-5 text-aqip-primary" /> Contrôle Qualité
+            <ShieldCheck className="h-5 w-5 text-aqip-primary" /> Workflow Asynchrone PGI
           </h3>
-          <p className="text-xs text-aqip-text-muted mb-4">Le système vérifie automatiquement la conformité des saisies avant validation.</p>
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-aqip-text-muted">Canal de détection (démo)</label>
-            <div className="relative">
-              <select value={canal} onChange={e => setCanal(e.target.value as CanalDetection)} className="w-full px-3 py-2 bg-aqip-bg-elevated border border-aqip-border rounded-md text-sm text-white appearance-none outline-none focus:border-aqip-primary">
-                {CANAUX.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-aqip-text-muted pointer-events-none" />
-            </div>
+          <p className="text-xs text-aqip-text-muted mb-4 leading-relaxed">
+            Dans un véritable PGI HCM, le système ne bloque pas l'agent. <br/><br/>
+            L'agent valide son travail. S'il commet une erreur, elle est détectée <strong>en aval</strong> (par l'IA, le contrôle qualité ou le citoyen).
+          </p>
+          <div className="p-3 bg-aqip-bg-elevated rounded-lg text-xs text-aqip-text-secondary border border-aqip-border font-medium">
+            1. Laissez l'erreur ("Jeane-Baptiste")<br/>
+            2. Cliquez sur Valider<br/>
+            3. Attendez 4 secondes... l'incident sera enregistré dans la DB!
           </div>
         </AQIPCard>
       </div>
 
-      {/* Résultat : la chaîne simple */}
-      {showResult && mapping && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-aqip-bg-surface border border-aqip-border p-8 rounded-xl max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-full bg-aqip-danger/20 flex items-center justify-center shrink-0">
-                <AlertTriangle className="h-6 w-6 text-aqip-danger" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-white">Erreur Détectée ({errorCode})</h2>
-                <p className="text-sm text-aqip-text-muted">Canal : {CANAUX.find(c => c.value === canal)?.label}</p>
-              </div>
+      {/* Notification Différée (Push) */}
+      {showNotification && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-right-8 fade-in duration-500">
+          <div className="bg-aqip-bg-surface border-l-4 border-aqip-warning shadow-xl p-4 rounded-r-xl max-w-sm flex items-start gap-3 ring-1 ring-black/5">
+            <div className="bg-aqip-warning/10 p-2 rounded-full shrink-0">
+              <Bell className="h-5 w-5 text-aqip-warning" />
             </div>
-
-            {/* La chaîne causale — Simple, lisible, crédible */}
-            <div className="space-y-4 mb-6">
-              {[
-                { step: 'Erreur', icon: AlertTriangle, color: 'text-aqip-danger bg-aqip-danger/10', text: mapping.errorLabel, sub: `"${formState.prenom}" → probable "Jean-Baptiste"` },
-                { step: 'Compétence', icon: ShieldCheck, color: 'text-aqip-warning bg-aqip-warning/10', text: mapping.competenceLabel, sub: `Gap : ${mapping.niveauRequis - 2} points (niveau 2 → requis ${mapping.niveauRequis})` },
-                { step: 'Formation', icon: BookOpen, color: 'text-aqip-primary bg-aqip-primary/10', text: mapping.formationLabel, sub: `${mapping.formationDuree} — ${mapping.formationType}` },
-                { step: 'Objectif', icon: ArrowRight, color: 'text-aqip-accent bg-aqip-accent/10', text: mapping.impactAttendu, sub: `-${mapping.impactPourcentage}% d'erreurs similaires` },
-              ].map((item, i) => (
-                <div key={item.step} className="flex items-start gap-3">
-                  <div className={`h-9 w-9 rounded-lg ${item.color} flex items-center justify-center shrink-0 mt-0.5`}>
-                    <item.icon className="h-4.5 w-4.5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-aqip-text-muted">{item.step}</div>
-                    <div className="text-sm font-medium text-white">{item.text}</div>
-                    <div className="text-xs text-aqip-text-muted">{item.sub}</div>
-                  </div>
-                  {i < 3 && <div className="absolute left-[34px] mt-10 h-4 w-px bg-aqip-border hidden" />}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-3">
-              <button onClick={() => setShowResult(false)} className="flex-1 px-4 py-2.5 bg-aqip-bg-elevated text-white text-sm font-medium rounded-md hover:bg-aqip-border transition-colors">
-                Corriger la saisie
-              </button>
-              <button onClick={() => { setShowResult(false); navigate('/agent/agt-001/dossier'); }} className="flex-1 px-4 py-2.5 bg-aqip-primary text-white text-sm font-medium rounded-md hover:bg-aqip-primary/90 transition-colors flex items-center justify-center gap-2">
-                Voir le Dossier <ArrowRight className="h-4 w-4" />
+            <div>
+              <h4 className="text-sm font-bold text-aqip-text-primary">Retour Qualité (A posteriori)</h4>
+              <p className="text-xs text-aqip-text-muted mt-1">
+                Une non-conformité a été relevée sur l'un de vos dossiers récents (Code: FR-01). L'incident a été remonté à votre superviseur via l'API.
+              </p>
+              <button onClick={() => navigate('/dashboard')} className="text-xs text-aqip-primary font-bold mt-2 hover:underline">
+                Voir mon espace de développement
               </button>
             </div>
           </div>

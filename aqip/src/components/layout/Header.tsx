@@ -1,6 +1,6 @@
-import { Bell, Search, Menu } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
+import { Bell, Menu, MessageSquare } from 'lucide-react';
 import RoleSwitcher from './RoleSwitcher';
+import ThemeToggle from './ThemeToggle';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -8,55 +8,60 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick }: HeaderProps) {
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-aqip-border bg-aqip-bg-surface px-4 sm:px-6 lg:px-8 shadow-sm">
+    <div className="flex flex-col shrink-0 w-full z-10 shadow-md">
+      {/* Top Bar - Solid Premium Blue */}
+      <header className="flex h-16 items-center justify-between bg-[#2B5E8D] px-4 sm:px-6 lg:px-8 border-b border-[#2B5E8D]">
       <div className="flex items-center gap-4 lg:hidden">
         <button 
           type="button" 
           onClick={onMenuClick}
-          className="-m-2.5 p-2.5 text-aqip-text-muted hover:text-white transition-colors"
+          className="-m-2.5 p-2.5 text-white/80 hover:text-white transition-colors"
         >
           <span className="sr-only">Ouvrir le menu</span>
-          <Menu className="h-6 w-6" aria-hidden="true" />
+          <Menu className="h-7 w-7" aria-hidden="true" />
         </button>
-        <div className="h-8 w-8 rounded-lg bg-aqip-primary flex items-center justify-center text-white font-bold text-sm">
-          AQ
+        <div className="flex items-center gap-2 text-white">
+          <div className="h-8 w-8 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center font-bold text-sm shadow-inner">
+            AQ
+          </div>
+          <span className="font-bold text-xl hidden sm:block tracking-tight text-white">ANIP Performance</span>
         </div>
       </div>
 
       <div className="hidden lg:flex flex-1 items-center gap-x-4 md:gap-x-6">
-        <form className="relative flex flex-1 max-w-lg" action="#" method="GET">
-          <label htmlFor="search-field" className="sr-only">
-            Rechercher un agent, un centre, un incident...
-          </label>
-          <Search
-            className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-aqip-text-muted ml-3"
-            aria-hidden="true"
-          />
-          <input
-            id="search-field"
-            className="block h-10 w-full rounded-md border border-aqip-border bg-aqip-bg-elevated py-1.5 pl-10 pr-3 text-aqip-text-primary placeholder:text-aqip-text-muted focus:ring-1 focus:ring-inset focus:ring-aqip-primary sm:text-sm sm:leading-6 transition-all"
-            placeholder="Rechercher (Dossier, Agent, Centre...)"
-            type="search"
-            name="search"
-          />
-        </form>
+        <div className="flex items-center gap-3 text-white ml-2">
+          <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-bold text-lg border border-white/10 shadow-inner">
+            AQ
+          </div>
+          <span className="font-bold text-2xl tracking-tight text-white drop-shadow-sm">ANIP Performance</span>
+        </div>
       </div>
       
-      <div className="flex items-center gap-x-2 sm:gap-x-4 lg:gap-x-6 ml-auto lg:ml-6">
+      <div className="flex items-center gap-x-3 sm:gap-x-5 lg:gap-x-6 ml-auto">
         <ThemeToggle />
+
+        <button type="button" className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#2B5E8D] bg-white hover:bg-gray-50 rounded-full transition-all shadow-sm">
+          <MessageSquare className="h-4 w-4" />
+          <span className="hidden sm:inline">Coach IA</span>
+        </button>
         
-        <button type="button" className="p-2 text-aqip-text-muted hover:text-aqip-text-primary hover:bg-aqip-bg-elevated rounded-full transition-colors relative">
+        <button type="button" className="p-2 text-white/80 hover:text-white rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-white/50">
           <span className="sr-only">Voir les notifications</span>
-          <Bell className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-2 right-2.5 block h-2 w-2 rounded-full bg-aqip-danger ring-2 ring-aqip-bg-surface" />
+          <Bell className="h-6 w-6" aria-hidden="true" />
+          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm border-2 border-[#2B5E8D]">
+            3
+          </span>
         </button>
 
         {/* Separator */}
-        <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-aqip-border" aria-hidden="true" />
+        <div className="hidden lg:block lg:h-8 lg:w-px lg:bg-white/30" aria-hidden="true" />
 
         {/* Profile dropdown / Role Switcher */}
-        <RoleSwitcher />
+        <div className="text-white">
+          <RoleSwitcher />
+        </div>
       </div>
-    </header>
+      </header>
+    </div>
   );
 }

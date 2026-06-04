@@ -49,6 +49,9 @@ import AgentWorkspacePage from './pages/Workspace/AgentWorkspacePage';
 // Dossier Amélioration
 import DossierAmeliorationPage from './pages/Agent/DossierAmeliorationPage';
 
+// Catalogue Formations (Nouveau)
+import CataloguePage from './pages/Formations/CataloguePage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -97,6 +100,13 @@ function App() {
           {/* Pilier 8 */}
           <Route path="rh/organigramme" element={<OrganigrammePage />} />
           <Route path="rh/talents" element={<TalentsPage />} />
+
+          {/* Catalogue Formations (Accessible par tous) */}
+          <Route path="formations/catalogue" element={<CataloguePage />} />
+          <Route path="documents" element={<CataloguePage />} />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

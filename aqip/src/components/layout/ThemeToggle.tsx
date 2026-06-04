@@ -7,7 +7,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full text-aqip-text-muted hover:bg-aqip-bg-elevated hover:text-aqip-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-aqip-primary focus:ring-offset-2 focus:ring-offset-aqip-bg-base"
+      className="p-2 rounded-full text-white/80 hover:bg-white/10 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
       aria-label="Toggle theme"
       title={`Passer au mode ${theme === 'light' ? 'sombre' : 'clair'}`}
     >

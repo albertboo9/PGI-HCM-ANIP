@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { Agent } from '../types';
+import dbData from '../../server/db.json';
 
 interface AgentState {
   agents: Agent[];
@@ -10,27 +12,29 @@ interface AgentState {
   getAgentsByCentre: (centreId: string) => Agent[];
 }
 
-export const useAgentStore = create<AgentState>((set, get) => ({
-  agents: [],
-  isLoading: false,
-  error: null,
-  
-  fetchAgents: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await fetch('/db.json');
-      const data = await response.json();
-      set({ agents: data.agents, isLoading: false });
-    } catch (error) {
-      set({ error: 'Failed to fetch agents', isLoading: false });
+export const useAgentStore = create<AgentState>()(
+  persist(
+    (set, get) => ({
+      agents: dbData.agents as Agent[],
+      isLoading: false,
+      error: null,
+      
+      fetchAgents: async () => {
+        if (get().agents.length === 0) {
+          set({ agents: dbData.agents as Agent[] });
+        }
+      },
+      
+      getAgentById: (id) => {
+        return get().agents.find(a => a.id === id);
+      },
+      
+      getAgentsByCentre: (centreId) => {
+        return get().agents.filter(a => a.centreId === centreId);
+      }
+    }),
+    {
+      name: 'aqip-agents-storage',
     }
-  },
-  
-  getAgentById: (id) => {
-    return get().agents.find(a => a.id === id);
-  },
-  
-  getAgentsByCentre: (centreId) => {
-    return get().agents.filter(a => a.centreId === centreId);
-  }
-}));
+  )
+);

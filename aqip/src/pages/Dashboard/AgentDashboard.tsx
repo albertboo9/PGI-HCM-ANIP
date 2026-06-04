@@ -1,128 +1,181 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import AQIPStatCard from '../../components/ui/AQIPStatCard';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPScoreRing from '../../components/ui/AQIPScoreRing';
-import AQIPProgress from '../../components/ui/AQIPProgress';
-import { BookOpen, Target, AlertTriangle, TrendingUp, Clock, ArrowRight, ShieldCheck } from 'lucide-react';
+import AQIPButton from '../../components/ui/AQIPButton';
+import { BookOpen, Target, CheckCircle2, TrendingUp, PlayCircle, ShieldCheck, RefreshCw } from 'lucide-react';
+import { useIncidentStore } from '../../store/incidentStore';
 import { useAuthStore } from '../../store/authStore';
 import { useAgentStore } from '../../store/agentStore';
-import { useIncidentStore } from '../../store/incidentStore';
 import { getAgentSkillGaps, getRecommendedFormations } from '../../services/skillEngine';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { motion } from 'framer-motion';
 
 export default function AgentDashboard() {
-  const { currentUser } = useAuthStore();
-  const { agents, fetchAgents } = useAgentStore();
   const { incidents, fetchIncidents } = useIncidentStore();
+  const { currentUser } = useAuthStore();
+  const { agents, fetchAgents, isLoading: agentsLoading } = useAgentStore();
 
-  const agentId = currentUser?.id || 'agt-001'; // Fallback to Jean Ahouangon
+  const agentId = currentUser?.id || 'agt-001';
 
   useEffect(() => {
-    if (agents.length === 0) fetchAgents();
-    if (incidents.length === 0) fetchIncidents();
-  }, [agents.length, incidents.length, fetchAgents, fetchIncidents]);
+    fetchIncidents();
+    fetchAgents();
+  }, [fetchIncidents, fetchAgents]);
 
   const agent = agents.find(a => a.id === agentId);
-  const agentIncidents = useMemo(() => incidents.filter(i => i.agentId === agentId), [incidents, agentId]);
-  
+  const agentIncidents = useMemo(() =>
+    incidents.filter(i => i.agentId === agentId)
+             .sort((a, b) => new Date(b.dateDetection).getTime() - new Date(a.dateDetection).getTime()),
+  [incidents, agentId]);
+
   const gaps = useMemo(() => agent ? getAgentSkillGaps(agent, incidents) : [], [agent, incidents]);
   const formations = useMemo(() => getRecommendedFormations(gaps), [gaps]);
 
-  if (!agent) return null;
+  const qualityData = [
+    { name: 'Sem 1', score: 85 },
+    { name: 'Sem 2', score: 88 },
+    { name: 'Sem 3', score: 92 },
+    { name: "Aujourd'hui", score: 95 },
+  ];
+
+  const compositeScore = agent?.scores?.composite ?? 95;
+
+  if (agentsLoading && !agent) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <RefreshCw className="h-8 w-8 text-aqip-primary animate-spin" />
+        <p className="text-aqip-text-muted font-medium">Chargement de votre espace...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-aqip-text-primary tracking-tight">Mon Espace Développement</h1>
-          <p className="text-sm text-aqip-text-muted mt-1">Performances, compétences et parcours de formation.</p>
-        </div>
-        <Link 
-          to={`/agent/${agent.id}/dossier`} 
-          className="px-5 py-2.5 bg-aqip-primary text-white text-sm font-medium rounded-lg hover:bg-aqip-primary/90 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-aqip-primary/20"
-        >
-          <BookOpen className="h-4 w-4" /> Mon Dossier Complet <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AQIPStatCard title="Score Actuel" value={`${agent.scores.composite}%`} icon={Target} trend={3} trendLabel="vs mois" />
-        <AQIPStatCard title="Erreurs (30j)" value={agentIncidents.length.toString()} icon={AlertTriangle} color={agentIncidents.length > 0 ? "danger" : "success"} />
-        <AQIPStatCard title="Gaps Identifiés" value={gaps.length.toString()} icon={ShieldCheck} color="warning" />
-        <AQIPStatCard title="Formations PDI" value={formations.length.toString()} icon={BookOpen} color="primary" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <AQIPCard className="flex flex-col items-center justify-center bg-gradient-to-br from-aqip-bg-surface to-aqip-primary/5 p-6">
-          <AQIPScoreRing score={agent.scores.composite} label="Score" size={140} strokeWidth={10} />
-          <div className="mt-3 flex items-center gap-1 text-aqip-accent text-sm font-medium">
-            <TrendingUp className="h-4 w-4" /> En amélioration
-          </div>
-        </AQIPCard>
-
-        <AQIPCard className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-aqip-text-primary flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-aqip-warning" /> Gaps de Compétences
-            </h2>
-          </div>
-          <div className="space-y-4">
-            {gaps.length > 0 ? gaps.map((g) => (
-              <div key={g.competenceId} className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-aqip-border pb-4 last:border-0 last:pb-0">
-                <div className="w-full sm:w-48 text-sm text-aqip-text-primary flex items-center gap-2 font-medium">
-                  <AlertTriangle className="h-4 w-4 text-aqip-danger shrink-0" />
-                  {g.competenceLabel}
+      {/* Hero Section Agent */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <AQIPCard className="bg-gradient-to-r from-[#2B5E8D] to-[#1E3A8A] text-white border-none shadow-[var(--aqip-shadow-glow)] relative overflow-hidden p-0">
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Bonjour, {agent?.prenom ?? 'Agent'} 👋</h1>
+              <p className="text-white/80 mt-1 text-sm">Agent d'enrôlement • Centre de Cotonou</p>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <div className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/20 flex items-center gap-2 text-sm">
+                  <Target className="h-4 w-4" /> Objectif: 98%
                 </div>
-                <div className="flex-1">
-                  <AQIPProgress value={g.niveauActuel} max={5} showValue={false} size="md" color="danger" />
-                </div>
-                <div className="flex items-center justify-between sm:justify-end gap-4 sm:w-32">
-                  <span className="text-sm font-bold text-aqip-danger">{g.niveauActuel} / {g.niveauRequis}</span>
-                  <span className="text-xs text-aqip-text-muted bg-aqip-bg-elevated px-2 py-1 rounded">-{g.gap} pts</span>
+                <div className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/20 flex items-center gap-2 text-sm">
+                  <TrendingUp className="h-4 w-4" /> Qualité: {compositeScore}%
                 </div>
               </div>
-            )) : (
-              <div className="text-center text-aqip-text-muted text-sm py-4">Aucun gap critique détecté. Vous êtes à jour !</div>
-            )}
-          </div>
-        </AQIPCard>
-      </div>
-
-      <AQIPCard>
-        <h2 className="text-lg font-semibold text-aqip-text-primary flex items-center gap-2 mb-4">
-          <BookOpen className="h-5 w-5 text-aqip-primary" /> Mon Plan de Développement Individuel (PDI)
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {formations.length > 0 ? formations.map((f) => (
-            <div key={f.formationId} className="p-4 bg-aqip-bg-elevated rounded-lg border border-aqip-border flex flex-col h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-sm font-semibold text-white leading-tight">{f.formationLabel}</p>
-                  <p className="text-xs text-aqip-text-muted flex items-center gap-1 mt-1.5">
-                    <Clock className="h-3 w-3" /> {f.duree} — {f.type}
-                  </p>
-                </div>
-                <span className="px-2 py-1 bg-aqip-primary/10 text-aqip-primary text-[10px] font-bold uppercase rounded">
-                  Recommandé
-                </span>
-              </div>
-              <p className="text-xs text-aqip-text-secondary mt-auto mb-4 bg-aqip-bg-surface p-2 rounded">
-                Objectif : {f.impactAttendu}
-              </p>
-              <div className="flex items-center gap-3">
-                <AQIPProgress value={0} size="sm" className="flex-1" />
-                <button className="px-3 py-1.5 text-xs font-medium bg-aqip-primary text-white rounded-md hover:bg-aqip-primary/90 transition-colors shrink-0">
-                  Démarrer
-                </button>
+              <div className="flex gap-3 mt-5">
+                <Link to="/workspace" className="px-4 py-2 bg-white text-[#2B5E8D] text-sm font-bold rounded-lg hover:bg-white/90 transition-all shadow-md flex items-center gap-2">
+                  Saisir un dossier
+                </Link>
+                {agent && (
+                  <Link to={`/agent/${agent.id}/dossier`} className="px-4 py-2 bg-white/10 text-white text-sm font-bold rounded-lg hover:bg-white/20 transition-all border border-white/20 flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" /> Mon Dossier 360°
+                  </Link>
+                )}
               </div>
             </div>
-          )) : (
-             <div className="col-span-full text-center text-aqip-text-muted text-sm py-6 border border-dashed border-aqip-border rounded-lg">
-                Aucune formation n'est actuellement requise.
-             </div>
-          )}
+            <div className="flex-shrink-0 bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/20">
+              <AQIPScoreRing score={compositeScore} size={110} strokeWidth={10} color="text-white" />
+            </div>
+          </div>
+          {/* Decorative Glow */}
+          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-white opacity-10 blur-3xl rounded-full"></div>
+        </AQIPCard>
+      </motion.div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* Timeline & Feedback IA */}
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="lg:col-span-2">
+          <AQIPCard className="h-full shadow-[var(--aqip-shadow-md)]">
+            <div className="flex justify-between items-center border-b border-aqip-border pb-3 mb-4">
+              <h2 className="text-sm font-bold text-aqip-text-muted uppercase tracking-wide flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-aqip-primary" /> Journal de Rétroaction Qualité
+              </h2>
+              <span className="text-xs font-bold bg-aqip-bg-elevated text-aqip-text-muted px-2 py-1 rounded-full">{agentIncidents.length} retour(s)</span>
+            </div>
+
+            <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+              {agentIncidents.length > 0 ? (
+                agentIncidents.slice(0, 5).map((incident) => (
+                  <div key={incident.id} className="relative pl-6 pb-4 border-l-2 border-aqip-border last:border-0 last:pb-0">
+                    <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-aqip-danger border-2 border-[var(--aqip-bg-surface)]"></div>
+                    <div className="bg-aqip-bg-elevated p-4 rounded-xl border border-aqip-border shadow-sm">
+                      <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
+                        <div>
+                          <span className="text-xs font-bold text-aqip-danger bg-aqip-danger/10 px-2 py-0.5 rounded">Code: {incident.codeErreur}</span>
+                          <h3 className="text-sm font-bold text-aqip-text-primary mt-1">{incident.erreurLibelle}</h3>
+                        </div>
+                        <span className="text-[10px] text-aqip-text-muted shrink-0">{new Date(incident.dateDetection).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                      <p className="text-xs text-aqip-text-secondary mt-2">{incident.description}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-12 flex flex-col items-center justify-center text-center">
+                  <CheckCircle2 className="h-12 w-12 text-aqip-accent mb-3 opacity-50" />
+                  <p className="text-sm font-bold text-aqip-text-primary">Travail Impeccable</p>
+                  <p className="text-xs text-aqip-text-muted mt-1">L'IA n'a détecté aucune anomalie sur vos récentes saisies.</p>
+                </div>
+              )}
+            </div>
+          </AQIPCard>
+        </motion.div>
+
+        {/* Recommandations & Graphique */}
+        <div className="space-y-6">
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
+            <AQIPCard className="shadow-[var(--aqip-shadow-md)]">
+              <h2 className="text-sm font-bold text-aqip-text-muted uppercase tracking-wide border-b border-aqip-border pb-2 mb-4">Évolution Personnelle</h2>
+              <div className="h-40 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={qualityData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--aqip-border)" />
+                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--aqip-text-muted)' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: 'var(--aqip-text-muted)' }} axisLine={false} tickLine={false} domain={[60, 100]} />
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: 'var(--aqip-shadow-md)', backgroundColor: 'var(--aqip-bg-surface)', color: 'var(--aqip-text-primary)' }} />
+                    <Line type="monotone" dataKey="score" stroke="var(--aqip-primary)" strokeWidth={3} dot={{ r: 4, fill: 'var(--aqip-primary)', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </AQIPCard>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
+            <AQIPCard className="shadow-[var(--aqip-shadow-md)] bg-[var(--aqip-primary)]/5 border-[var(--aqip-primary)]/20">
+              <h2 className="text-sm font-bold text-aqip-primary uppercase tracking-wide border-b border-aqip-primary/20 pb-2 mb-4 flex items-center gap-2">
+                <BookOpen className="h-4 w-4" /> Recommandation IA
+              </h2>
+              {formations.length > 0 ? (
+                <div className="space-y-3">
+                  {formations.slice(0, 2).map(f => (
+                    <div key={f.formationId} className="bg-[var(--aqip-bg-surface)] p-3 rounded-xl border border-aqip-border shadow-sm">
+                      <h3 className="text-sm font-bold text-aqip-text-primary">{f.formationLabel}</h3>
+                      <p className="text-xs text-aqip-text-muted mt-1">{f.duree} — {f.type}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-[var(--aqip-bg-surface)] p-3 rounded-xl border border-aqip-border shadow-sm mb-4">
+                  <h3 className="text-sm font-bold text-aqip-text-primary">Module: Langue Française</h3>
+                  <p className="text-xs text-aqip-text-muted mt-1">Suite aux erreurs récentes (FR-01), ce module de 30min vous est suggéré.</p>
+                </div>
+              )}
+              <Link to="/formations/catalogue" className="block mt-4">
+                <AQIPButton variant="primary" className="w-full justify-center gap-2">
+                  <PlayCircle className="h-4 w-4" /> Voir le catalogue
+                </AQIPButton>
+              </Link>
+            </AQIPCard>
+          </motion.div>
         </div>
-      </AQIPCard>
+      </div>
     </div>
   );
 }

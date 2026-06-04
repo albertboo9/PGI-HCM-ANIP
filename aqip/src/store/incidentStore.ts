@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { Incident } from '../types';
+import dbData from '../../server/db.json';
 
 interface IncidentState {
   incidents: Incident[];
@@ -8,46 +10,53 @@ interface IncidentState {
   fetchIncidents: () => Promise<void>;
   getIncidentById: (id: string) => Incident | undefined;
   getIncidentsByAgent: (agentId: string) => Incident[];
-  addIncident: (incident: Incident) => void;
-  updateIncident: (id: string, updates: Partial<Incident>) => void;
+  addIncident: (incident: Incident) => Promise<void>;
+  updateIncident: (id: string, updates: Partial<Incident>) => Promise<void>;
   getTotalNonQualityCost: () => number;
 }
 
-export const useIncidentStore = create<IncidentState>((set, get) => ({
-  incidents: [],
-  isLoading: false,
-  error: null,
+export const useIncidentStore = create<IncidentState>()(
+  persist(
+    (set, get) => ({
+      incidents: dbData.incidents as Incident[],
+      isLoading: false,
+      error: null,
 
-  fetchIncidents: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await fetch('/db.json');
-      const data = await response.json();
-      set({ incidents: data.incidents, isLoading: false });
-    } catch (error) {
-      set({ error: 'Failed to fetch incidents', isLoading: false });
+      fetchIncidents: async () => {
+        // Avec persist, les données sont déjà là, on s'assure juste qu'on a un minimum
+        if (get().incidents.length === 0) {
+          set({ incidents: dbData.incidents as Incident[] });
+        }
+      },
+
+      getIncidentById: (id) => {
+        return get().incidents.find(i => i.id === id);
+      },
+
+      getIncidentsByAgent: (agentId) => {
+        return get().incidents.filter(i => i.agentId === agentId);
+      },
+
+      addIncident: async (incident) => {
+        set((state) => ({
+          incidents: [incident, ...state.incidents]
+        }));
+      },
+
+      updateIncident: async (id, updates) => {
+        set((state) => ({
+          incidents: state.incidents.map(inc => 
+            inc.id === id ? { ...inc, ...updates } as Incident : inc
+          )
+        }));
+      },
+      
+      getTotalNonQualityCost: () => {
+        return get().incidents.reduce((total, inc) => total + (inc.coutEstime || 0), 0);
+      }
+    }),
+    {
+      name: 'aqip-incidents-storage',
     }
-  },
-
-  getIncidentById: (id) => {
-    return get().incidents.find(i => i.id === id);
-  },
-
-  getIncidentsByAgent: (agentId) => {
-    return get().incidents.filter(i => i.agentId === agentId);
-  },
-
-  addIncident: (incident) => set((state) => ({
-    incidents: [incident, ...state.incidents]
-  })),
-
-  updateIncident: (id, updates) => set((state) => ({
-    incidents: state.incidents.map(inc => 
-      inc.id === id ? { ...inc, ...updates } : inc
-    )
-  })),
-  
-  getTotalNonQualityCost: () => {
-    return get().incidents.reduce((total, inc) => total + (inc.coutEstime || 0), 0);
-  }
-}));
+  )
+);

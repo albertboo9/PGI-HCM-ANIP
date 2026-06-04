@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, AlertTriangle, Users, BrainCircuit, PlayCircle,
-  Network, Award, BookOpen, MessageSquare, TrendingUp,
+  Network, MessageSquare, TrendingUp,
   ShieldAlert, Settings, Briefcase, ChevronDown, ChevronRight,
-  Target, FileText, MapPin, PenTool, Search
+  Target, FileText, PenTool, Search, X, Library
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useState, useMemo } from 'react';
@@ -27,17 +27,15 @@ const getNavigationGroups = (role: string) => {
       {
         name: 'Développement (HCM)',
         items: [
-          { name: 'Catalogue Formations', to: '/excellence/lms', icon: BookOpen },
           { name: 'Matrice des Talents', to: '/rh/talents', icon: Briefcase },
           { name: 'Référentiel Compétences', to: '/referentiel/competences', icon: Target },
-          { name: 'Feedback & Évaluations', to: '/excellence/feedback', icon: MessageSquare },
+          { name: 'Catalogue Formations', to: '/formations/catalogue', icon: Library },
         ]
       },
       {
         name: 'Organisation',
         items: [
           { name: 'Organigramme', to: '/rh/organigramme', icon: Network },
-          { name: 'Fiches Métiers', to: '/referentiel/metiers', icon: FileText },
           { name: 'Profils Agents', to: '/referentiel/profils', icon: Users },
         ]
       },
@@ -45,7 +43,6 @@ const getNavigationGroups = (role: string) => {
         name: 'Qualité & Conformité',
         items: [
           { name: 'Journal des Incidents', to: '/incidents', icon: AlertTriangle },
-          { name: 'Audit & Traçabilité', to: '/gouvernance/audit', icon: Settings },
           { name: 'Observatoire National', to: '/qualite/observatoire', icon: TrendingUp },
         ]
       }
@@ -65,16 +62,14 @@ const getNavigationGroups = (role: string) => {
         name: 'Supervision',
         items: [
           { name: 'Journal des Incidents', to: '/incidents', icon: AlertTriangle },
-          { name: 'Réseau d\'Antennes', to: '/qualite/centres', icon: MapPin },
           { name: 'Satisfaction Citoyen', to: '/satisfaction', icon: MessageSquare },
         ]
       },
       {
-        name: 'Outils & Analyse',
+        name: 'Développement',
         items: [
           { name: 'Assistant IA', to: '/ia', icon: BrainCircuit },
-          { name: 'Taxonomie Erreurs', to: '/qualite/erreurs', icon: FileText },
-          { name: 'Scores & KPI', to: '/intelligence/scores', icon: TrendingUp },
+          { name: 'Catalogue Formations', to: '/formations/catalogue', icon: Library },
         ]
       }
     ];
@@ -92,15 +87,13 @@ const getNavigationGroups = (role: string) => {
         name: 'Opérations',
         items: [
           { name: 'Enrôlement (RAVIP)', to: '/workspace', icon: PenTool },
-          { name: 'Parcours Citoyen', to: '/citoyen', icon: Users },
         ]
       },
       {
         name: 'Mon Développement',
         items: [
-          { name: 'Mes Formations', to: '/excellence/lms', icon: BookOpen },
-          { name: 'Feedback 360', to: '/excellence/feedback', icon: MessageSquare },
-          { name: 'Mes Certifications', to: '/excellence/certifications', icon: Award },
+          { name: 'Catalogue Formations', to: '/formations/catalogue', icon: Library },
+          { name: 'Documents', to: '/documents', icon: FileText },
         ]
       }
     ];
@@ -119,7 +112,6 @@ const getNavigationGroups = (role: string) => {
         items: [
           { name: 'Journal des Incidents', to: '/incidents', icon: AlertTriangle },
           { name: 'Audit & Conformité', to: '/gouvernance/audit', icon: Settings },
-          { name: 'Observatoire', to: '/qualite/observatoire', icon: TrendingUp },
         ]
       }
     ];
@@ -142,38 +134,33 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <div className="flex h-full flex-col bg-aqip-sidebar-bg border-r border-aqip-border overflow-hidden">
-      {/* Sidebar Header */}
-      <div className="flex h-16 shrink-0 items-center gap-3 px-6 border-b border-aqip-border/50">
-        <div className="h-8 w-8 rounded-lg bg-aqip-primary flex items-center justify-center text-white font-bold text-sm shadow-md">
-          AQ
-        </div>
-        <div className="flex flex-col">
-          <span className="text-lg font-bold text-aqip-text-primary tracking-tight leading-tight">AQIP<span className="text-aqip-primary">.</span></span>
-          <span className="text-[10px] uppercase font-semibold text-aqip-text-muted tracking-widest leading-none">ANIP Bénin</span>
-        </div>
+    <div className="flex h-full flex-col bg-[var(--aqip-sidebar-bg)] border-r border-aqip-border overflow-hidden transition-colors duration-300">
+      <div className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-aqip-border/50">
+        <span className="text-sm font-bold text-aqip-text-primary tracking-widest uppercase">Menu Principal</span>
+        {/* Mobile close button */}
+        <button onClick={onClose} className="lg:hidden text-aqip-text-muted hover:text-aqip-text-primary p-1">
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Quick Search Box (Mock) */}
       <div className="px-4 py-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-aqip-text-muted" />
           <input 
             type="text" 
             placeholder="Rechercher..." 
-            className="w-full bg-aqip-bg-surface border border-aqip-border/50 text-aqip-text-primary text-sm rounded-lg pl-9 pr-3 py-2 focus:ring-1 focus:ring-aqip-primary focus:border-aqip-primary transition-all placeholder:text-aqip-text-muted"
+            className="w-full bg-[var(--aqip-bg-surface)] border border-aqip-border/50 text-aqip-text-primary text-sm rounded-lg pl-9 pr-3 py-2 focus:ring-1 focus:ring-[#2B5E8D] focus:border-[#2B5E8D] transition-all placeholder:text-[var(--aqip-text-muted)] shadow-sm"
           />
         </div>
       </div>
       
-      {/* Navigation Links */}
       <nav className="flex-1 overflow-y-auto px-4 pb-8 custom-scrollbar">
         <ul role="list" className="flex flex-col gap-y-6">
           {navGroups.map((group) => (
             <li key={group.name}>
               <button
                 onClick={() => toggleGroup(group.name)}
-                className="flex w-full items-center justify-between text-xs font-semibold text-aqip-text-muted hover:text-aqip-text-primary transition-colors mb-2 tracking-wide"
+                className="flex w-full items-center justify-between text-xs font-semibold text-[var(--aqip-text-muted)] hover:text-[var(--aqip-text-primary)] transition-colors mb-2 tracking-wide"
               >
                 {group.name}
                 {openGroups[group.name] ? (
@@ -197,9 +184,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
                         className={({ isActive }) =>
                           clsx(
                             isActive
-                              ? 'bg-aqip-primary/10 text-aqip-primary font-medium'
-                              : 'text-aqip-text-secondary hover:text-aqip-text-primary hover:bg-aqip-bg-elevated',
-                            'group flex items-center gap-x-3 rounded-md px-3 py-2 text-sm transition-all'
+                              ? 'bg-[#2B5E8D] text-white font-bold shadow-md'
+                              : 'text-[var(--aqip-text-secondary)] hover:text-[var(--aqip-text-primary)] hover:bg-[var(--aqip-bg-elevated)]',
+                            'group flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm transition-all'
                           )
                         }
                       >
@@ -207,8 +194,8 @@ export default function Sidebar({ onClose }: SidebarProps) {
                           <>
                             <item.icon
                               className={clsx(
-                                isActive ? 'text-aqip-primary' : 'text-aqip-text-muted group-hover:text-aqip-text-primary',
-                                'h-4 w-4 shrink-0 transition-colors'
+                                isActive ? 'text-white' : 'text-[var(--aqip-text-muted)] group-hover:text-[var(--aqip-text-primary)]',
+                                'h-5 w-5 shrink-0 transition-colors'
                               )}
                               aria-hidden="true"
                             />

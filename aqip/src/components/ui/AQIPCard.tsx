@@ -11,7 +11,7 @@ export default function AQIPCard({ children, className, noPadding = false, ...pr
   return (
     <div 
       className={clsx(
-        "bg-aqip-bg-surface border border-aqip-border rounded-xl shadow-sm overflow-hidden",
+        "bg-[var(--aqip-bg-surface)] border border-[var(--aqip-border)] rounded-xl shadow-[var(--aqip-shadow-sm)] hover:shadow-[var(--aqip-shadow-md)] overflow-hidden transition-all duration-300",
         !noPadding && "p-6",
         className
       )}

@@ -1,82 +1,116 @@
 /* ============================================================
-   AQIP Design Tokens — Dual Theme System (Light + Dark)
+   AQIP Design Tokens — Stripe-Level UI/UX
    ============================================================ */
 
 :root,
 [data-theme="light"] {
-  --aqip-bg-base: #F9FAFB;
-  --aqip-bg-surface: #FFFFFF;
-  --aqip-bg-elevated: #F3F4F6;
+  /* Fonds */
+  --aqip-bg-base: #F8FAFC; 
+  --aqip-bg-surface: #FFFFFF; 
+  --aqip-bg-elevated: #F1F5F9;
+  
+  /* Glassmorphism */
+  --aqip-glass-bg: rgba(255, 255, 255, 0.7);
+  --aqip-glass-border: rgba(255, 255, 255, 0.5);
 
+  /* Header & Marque (Bleu profond et vif) */
+  --aqip-header-bg: #2B5E8D; /* Bleu de la maquette institutionnelle */
+  --aqip-header-text: #FFFFFF;
+
+  /* Couleurs primaires (Interactions) */
   --aqip-primary: #2563EB;
   --aqip-primary-dark: #1D4ED8;
-  --aqip-primary-light: #DBEAFE;
+  --aqip-primary-light: #EFF6FF;
 
-  --aqip-accent: #059669;
+  /* Statuts */
+  --aqip-accent: #10B981; /* Vert émeraude franc */
   --aqip-accent-light: #D1FAE5;
-  --aqip-warning: #D97706;
+  
+  --aqip-warning: #F59E0B;
   --aqip-warning-light: #FEF3C7;
-  --aqip-danger: #DC2626;
+  
+  --aqip-danger: #EF4444;
   --aqip-danger-light: #FEE2E2;
-  --aqip-gold: #D97706;
+  
+  --aqip-gold: #F59E0B;
 
-  --aqip-text-primary: #111827;
-  --aqip-text-secondary: #374151;
-  --aqip-text-muted: #6B7280;
+  /* Textes */
+  --aqip-text-primary: #0F172A;
+  --aqip-text-secondary: #334155; 
+  --aqip-text-muted: #64748B; 
   --aqip-text-inverted: #FFFFFF;
 
-  --aqip-border: #E5E7EB;
-  --aqip-border-focus: #2563EB;
+  /* Bordures */
+  --aqip-border: #E2E8F0;
+  --aqip-border-focus: #3B82F6;
 
-  --aqip-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --aqip-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --aqip-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  /* Ombres Stripe-like (précises et multicouches) */
+  --aqip-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --aqip-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
+  --aqip-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.025);
+  --aqip-shadow-glow: 0 0 15px rgba(37, 99, 235, 0.3);
 
+  /* Sidebar */
   --aqip-sidebar-bg: #FFFFFF;
   --aqip-sidebar-active-bg: #EFF6FF;
   --aqip-sidebar-active-text: #2563EB;
-  --aqip-sidebar-hover-bg: #F3F4F6;
+  --aqip-sidebar-hover-bg: #F8FAFC;
 
-  --aqip-header-bg: #FFFFFF;
-
-  --aqip-overlay: rgb(0 0 0 / 0.3);
+  --aqip-overlay: rgba(15, 23, 42, 0.4);
 }
 
 [data-theme="dark"] {
-  --aqip-bg-base: #0B0E1A;
-  --aqip-bg-surface: #111827;
-  --aqip-bg-elevated: #1F2937;
+  /* Fonds (Dark mode moderne) */
+  --aqip-bg-base: #0F172A;
+  --aqip-bg-surface: #1E293B;
+  --aqip-bg-elevated: #334155;
+  
+  /* Glassmorphism */
+  --aqip-glass-bg: rgba(30, 41, 59, 0.7);
+  --aqip-glass-border: rgba(255, 255, 255, 0.05);
 
+  /* Header (Assombri) */
+  --aqip-header-bg: #020617;
+  --aqip-header-text: #F8FAFC;
+
+  /* Couleurs primaires (Ajustées pour contraste sombre) */
   --aqip-primary: #3B82F6;
-  --aqip-primary-dark: #1D4ED8;
-  --aqip-primary-light: rgba(59, 130, 246, 0.15);
+  --aqip-primary-dark: #60A5FA;
+  --aqip-primary-light: #1E3A8A;
 
-  --aqip-accent: #10B981;
-  --aqip-accent-light: rgba(16, 185, 129, 0.15);
-  --aqip-warning: #F59E0B;
-  --aqip-warning-light: rgba(245, 158, 11, 0.15);
-  --aqip-danger: #EF4444;
-  --aqip-danger-light: rgba(239, 68, 68, 0.15);
-  --aqip-gold: #F59E0B;
+  /* Statuts */
+  --aqip-accent: #34D399;
+  --aqip-accent-light: #064E3B;
+  
+  --aqip-warning: #FBBF24;
+  --aqip-warning-light: #78350F;
+  
+  --aqip-danger: #F87171;
+  --aqip-danger-light: #7F1D1D;
+  
+  --aqip-gold: #FCD34D;
 
-  --aqip-text-primary: #F9FAFB;
-  --aqip-text-secondary: #D1D5DB;
-  --aqip-text-muted: #9CA3AF;
-  --aqip-text-inverted: #111827;
+  /* Textes */
+  --aqip-text-primary: #F8FAFC;
+  --aqip-text-secondary: #CBD5E1; 
+  --aqip-text-muted: #94A3B8; 
+  --aqip-text-inverted: #0F172A;
 
-  --aqip-border: #1F2937;
-  --aqip-border-focus: #3B82F6;
+  /* Bordures */
+  --aqip-border: #334155;
+  --aqip-border-focus: #60A5FA;
 
-  --aqip-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --aqip-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
-  --aqip-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+  /* Ombres */
+  --aqip-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --aqip-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --aqip-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --aqip-shadow-glow: 0 0 15px rgba(59, 130, 246, 0.4);
 
-  --aqip-sidebar-bg: #111827;
-  --aqip-sidebar-active-bg: rgba(59, 130, 246, 0.1);
-  --aqip-sidebar-active-text: #3B82F6;
-  --aqip-sidebar-hover-bg: #1F2937;
+  /* Sidebar */
+  --aqip-sidebar-bg: #1E293B;
+  --aqip-sidebar-active-bg: #0F172A;
+  --aqip-sidebar-active-text: #60A5FA;
+  --aqip-sidebar-hover-bg: #334155;
 
-  --aqip-header-bg: #111827;
-
-  --aqip-overlay: rgb(0 0 0 / 0.6);
+  --aqip-overlay: rgba(0, 0, 0, 0.6);
 }
