@@ -15,7 +15,7 @@ export default function TalentsPage() {
   const teamGaps = useMemo(() => getPriorityAgents(agents, incidents, 20), [agents, incidents]);
 
   // Mocking PDI states based on agent IDs to show different stages in the pipeline
-  const getAgentPipeline = (agentId: string, index: number) => {
+  const getAgentPipeline = (index: number) => {
     if (index === 0) return { status: 'Terminé', roi: '+95% Qualité', pdi: 'Capture Biométrique', step: 4 };
     if (index === 1) return { status: 'En Formation', roi: 'En cours', pdi: 'Français Administratif', step: 3 };
     if (index === 2) return { status: 'PDI Validé', roi: 'Attente', pdi: 'Relation Citoyen', step: 2 };
@@ -42,7 +42,7 @@ export default function TalentsPage() {
             <Briefcase className="h-5 w-5 text-aqip-primary" />
             Pipeline d'Amélioration Continue
           </h2>
-          <AQIPBadge variant="primary">Vue consolidée DRH</AQIPBadge>
+          <AQIPBadge variant="info">Vue consolidée DRH</AQIPBadge>
         </div>
 
         <div className="overflow-x-auto">
@@ -59,7 +59,7 @@ export default function TalentsPage() {
             </thead>
             <tbody className="divide-y divide-aqip-border bg-white">
               {teamGaps.slice(0, 8).map(({ agent, incidentCount, topGap }, index) => {
-                const pipeline = getAgentPipeline(agent.id, index);
+                const pipeline = getAgentPipeline(index);
                 
                 return (
                   <tr key={agent.id} className="hover:bg-aqip-bg-elevated/50 transition-colors">
@@ -88,7 +88,7 @@ export default function TalentsPage() {
                         <span className="font-medium text-aqip-text-primary">{topGap?.competenceLabel || 'N/A'}</span>
                         <div className="flex items-center gap-1 text-xs mt-1">
                           <span className="text-aqip-danger font-bold">Gap -{topGap?.gap}</span>
-                          <span className="text-aqip-text-muted">(Niv. requis: {topGap?.competenceNiveauRequis})</span>
+                          <span className="text-aqip-text-muted">(Niv. requis: {topGap?.niveauRequis})</span>
                         </div>
                       </div>
                     </td>
