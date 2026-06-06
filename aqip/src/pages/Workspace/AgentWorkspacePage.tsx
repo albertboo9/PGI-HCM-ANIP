@@ -1,18 +1,16 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPButton from '../../components/ui/AQIPButton';
-import { Camera, User, ShieldCheck, CheckCircle2, Bell } from 'lucide-react';
-import { useIncidentStore } from '../../store/incidentStore';
+import { Link } from 'react-router-dom';
+import { Camera, User, ShieldCheck, CheckCircle2, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 export default function AgentWorkspacePage() {
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [formState, setFormState] = useState({ nom: 'Houngbédji', prenom: 'Jeane-Baptiste', commune: 'Cotonou' });
-  const { addIncident } = useIncidentStore();
+  const addIncident = (_data: any) => {};
   const { currentUser } = useAuthStore();
 
   const errorCode = 'FR-01'; // Faute de frappe
@@ -135,20 +133,46 @@ export default function AgentWorkspacePage() {
         </AQIPCard>
       </div>
 
-      {/* Notification Différée (Push) */}
+      {/* Notification Différée (Push du Coach — enrichie avec suggestion formation) */}
       {showNotification && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-right-8 fade-in duration-500">
-          <div className="bg-aqip-bg-surface border-l-4 border-aqip-warning shadow-xl p-4 rounded-r-xl max-w-sm flex items-start gap-3 ring-1 ring-black/5">
-            <div className="bg-aqip-warning/10 p-2 rounded-full shrink-0">
-              <Bell className="h-5 w-5 text-aqip-warning" />
+          <div className="bg-aqip-bg-surface border border-aqip-primary/30 shadow-2xl p-5 rounded-2xl max-w-md flex flex-col gap-3 ring-1 ring-black/5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-aqip-primary to-aqip-accent"></div>
+            
+            <div className="flex items-start gap-3">
+              <div className="bg-aqip-primary/10 p-2 rounded-full shrink-0">
+                <Sparkles className="h-5 w-5 text-aqip-primary" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-aqip-text-primary flex items-center gap-2">
+                  Coach AQIP
+                  <span className="text-[10px] font-medium text-aqip-accent bg-aqip-accent/10 px-1.5 py-0.5 rounded-full">Notification</span>
+                </h4>
+                <p className="text-xs text-aqip-text-secondary mt-1.5 leading-relaxed">
+                  Un rejet a été constaté sur votre dossier <strong className="text-aqip-text-primary">(Code: {errorCode})</strong>. 
+                  C'est une erreur fréquente de transcription. Ne vous inquiétez pas, je peux vous aider à progresser.
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-aqip-text-primary">Retour Qualité (A posteriori)</h4>
-              <p className="text-xs text-aqip-text-muted mt-1">
-                Une non-conformité a été relevée sur l'un de vos dossiers récents (Code: FR-01). L'incident a été remonté à votre superviseur via l'API.
-              </p>
-              <button onClick={() => navigate('/dashboard')} className="text-xs text-aqip-primary font-bold mt-2 hover:underline">
-                Voir mon espace de développement
+
+            {/* Suggestion de formation contextuelle */}
+            <div className="bg-aqip-bg-elevated border border-aqip-border rounded-xl p-3 flex items-center gap-3">
+              <BookOpen className="h-5 w-5 text-aqip-primary shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-aqip-text-primary">Formation recommandée</p>
+                <p className="text-[10px] text-aqip-text-muted truncate">Maîtrise de la transcription des actes d'état civil (30 min)</p>
+              </div>
+              <Link to="/formations/catalogue" className="text-[10px] font-bold text-aqip-primary hover:underline whitespace-nowrap flex items-center gap-1">
+                Voir <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+
+            <div className="flex gap-2">
+              <Link to="/coach" className="flex-1 text-center text-xs text-white bg-aqip-primary px-3 py-2 rounded-lg font-bold hover:bg-aqip-primary/90 transition-colors shadow-sm">
+                En parler avec mon Coach
+              </Link>
+              <button onClick={() => setShowNotification(false)} className="text-xs text-aqip-text-muted hover:text-aqip-text-primary px-3 py-2 rounded-lg font-medium transition-colors">
+                Plus tard
               </button>
             </div>
           </div>

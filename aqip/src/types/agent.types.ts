@@ -13,6 +13,8 @@ export interface AgentScores {
   composite: number;
 }
 
+export interface AgentScoresApres extends AgentScores {}
+
 export interface AgentMutation {
   date: string;
   de: string;
@@ -36,5 +38,7 @@ export interface Agent {
   statut: 'actif' | 'conge' | 'suspendu' | 'mutation';
   competences: AgentCompetence[];
   scores: AgentScores;
+  scoresApres?: AgentScoresApres;
   historiqueMutations?: AgentMutation[];
+  photoUrl?: string;
 }

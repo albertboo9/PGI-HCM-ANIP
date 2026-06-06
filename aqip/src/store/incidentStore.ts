@@ -1,62 +1,89 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Incident } from '../types';
-import dbData from '../../server/db.json';
+import { useDataStore } from '../data/dataStore';
 
 interface IncidentState {
   incidents: Incident[];
-  isLoading: boolean;
-  error: string | null;
-  fetchIncidents: () => Promise<void>;
-  getIncidentById: (id: string) => Incident | undefined;
-  getIncidentsByAgent: (agentId: string) => Incident[];
-  addIncident: (incident: Incident) => Promise<void>;
-  updateIncident: (id: string, updates: Partial<Incident>) => Promise<void>;
-  getTotalNonQualityCost: () => number;
+  
+  getAll: () => Incident[];
+  getById: (id: string) => Incident | undefined;
+  getByCentre: (centreId: string) => Incident[];
+  getByAgent: (agentId: string) => Incident[];
+  getByCategorie: (categorie: string) => Incident[];
+  getByStatut: (statut: string) => Incident[];
+  getByGravite: (gravite: string) => Incident[];
+  
+  create: (data: Omit<Incident, 'id' | 'dateDetection' | 'historique'>) => Incident;
+  update: (id: string, data: Partial<Incident>) => void;
+  remove: (id: string) => void;
+  
+  getStats: () => { total: number; parCategorie: Record<string, number>; parGravite: Record<string, number>; parStatut: Record<string, number> };
+  getIncidentsRecents: (limit?: number) => Incident[];
 }
 
 export const useIncidentStore = create<IncidentState>()(
   persist(
     (set, get) => ({
-      incidents: dbData.incidents as Incident[],
-      isLoading: false,
-      error: null,
+      incidents: [],
 
-      fetchIncidents: async () => {
-        // Avec persist, les données sont déjà là, on s'assure juste qu'on a un minimum
-        if (get().incidents.length === 0) {
-          set({ incidents: dbData.incidents as Incident[] });
+      getAll: () => {
+        const inc = get().incidents;
+        if (inc.length === 0) {
+          const data = useDataStore.getState().getCollection('incidents');
+          set({ incidents: data });
+          return data;
         }
+        return inc;
       },
 
-      getIncidentById: (id) => {
-        return get().incidents.find(i => i.id === id);
+      getById: (id) => get().incidents.find(i => i.id === id),
+      getByCentre: (centreId) => get().incidents.filter(i => i.centreId === centreId),
+      getByAgent: (agentId) => get().incidents.filter(i => i.agentId === agentId),
+      getByCategorie: (categorie) => get().incidents.filter(i => i.categorie === categorie),
+      getByStatut: (statut) => get().incidents.filter(i => i.statut === statut),
+      getByGravite: (gravite) => get().incidents.filter(i => i.gravite === gravite),
+
+      create: (data) => {
+        const newInc: Incident = {
+          id: `inc-${Date.now()}`,
+          ...data,
+          dateDetection: new Date().toISOString(),
+          historique: [{ date: new Date().toISOString(), action: 'DÉTECTION', user: 'Agent' }],
+        };
+        set(state => ({ incidents: [...state.incidents, newInc] }));
+        return newInc;
       },
 
-      getIncidentsByAgent: (agentId) => {
-        return get().incidents.filter(i => i.agentId === agentId);
-      },
-
-      addIncident: async (incident) => {
-        set((state) => ({
-          incidents: [incident, ...state.incidents]
+      update: (id, data) => {
+        set(state => ({
+          incidents: state.incidents.map(i => i.id === id ? { ...i, ...data } : i),
         }));
       },
 
-      updateIncident: async (id, updates) => {
-        set((state) => ({
-          incidents: state.incidents.map(inc => 
-            inc.id === id ? { ...inc, ...updates } as Incident : inc
-          )
-        }));
+      remove: (id) => {
+        set(state => ({ incidents: state.incidents.filter(i => i.id !== id) }));
       },
-      
-      getTotalNonQualityCost: () => {
-        return get().incidents.reduce((total, inc) => total + (inc.coutEstime || 0), 0);
-      }
+
+      getStats: () => {
+        const all = get().incidents;
+        const parCategorie: Record<string, number> = {};
+        const parGravite: Record<string, number> = {};
+        const parStatut: Record<string, number> = {};
+        all.forEach(i => {
+          parCategorie[i.categorie] = (parCategorie[i.categorie] || 0) + 1;
+          parGravite[i.gravite] = (parGravite[i.gravite] || 0) + 1;
+          parStatut[i.statut] = (parStatut[i.statut] || 0) + 1;
+        });
+        return { total: all.length, parCategorie, parGravite, parStatut };
+      },
+
+      getIncidentsRecents: (limit = 10) => {
+        return [...get().incidents]
+          .sort((a, b) => new Date(b.dateDetection).getTime() - new Date(a.dateDetection).getTime())
+          .slice(0, limit);
+      },
     }),
-    {
-      name: 'aqip-incidents-storage',
-    }
+    { name: 'aqip-incidents', partialize: (state) => ({ incidents: state.incidents }) }
   )
 );

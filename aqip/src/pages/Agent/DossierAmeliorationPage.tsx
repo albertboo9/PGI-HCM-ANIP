@@ -1,13 +1,14 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+
 import { useParams, Link } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
-import AQIPProgress from '../../components/ui/AQIPProgress';
 import AQIPBadge from '../../components/ui/AQIPBadge';
 import { useAgentStore } from '../../store/agentStore';
 import { useIncidentStore } from '../../store/incidentStore';
 import { getAgentSkillGaps, getRecommendedFormations } from '../../services/skillEngine';
 
-import { User, AlertTriangle, Target, BookOpen, TrendingUp, ArrowLeft, FileText, Shield, Eye, MessageSquare } from 'lucide-react';
+import { User, AlertTriangle, Target, BookOpen, TrendingUp, ArrowLeft, FileText, Shield, Eye, MessageSquare, Sparkles } from 'lucide-react';
+import { getProactiveMessage } from '../../services/coachEngine';
 
 const CANAL_CONFIG: Record<string, { label: string; icon: typeof Eye; color: string }> = {
   controleur: { label: 'Contrôleur Qualité', icon: Shield, color: 'text-aqip-primary' },
@@ -18,13 +19,10 @@ const CANAL_CONFIG: Record<string, { label: string; icon: typeof Eye; color: str
 
 export default function DossierAmeliorationPage() {
   const { agentId } = useParams<{ agentId: string }>();
-  const { agents, fetchAgents } = useAgentStore();
-  const { incidents, fetchIncidents } = useIncidentStore();
+  const agents = useAgentStore(s => s.getAll());
+  const incidents = useIncidentStore(s => s.getAll());
 
-  useEffect(() => {
-    if (agents.length === 0) fetchAgents();
-    if (incidents.length === 0) fetchIncidents();
-  }, [agents.length, incidents.length, fetchAgents, fetchIncidents]);
+  
 
   const agent = agents.find(a => a.id === agentId);
   const agentIncidents = useMemo(
@@ -92,6 +90,27 @@ export default function DossierAmeliorationPage() {
         </div>
       </AQIPCard>
 
+      {/* Coach IA — Commentaire personnalisé sur le dossier */}
+      <AQIPCard className="bg-gradient-to-r from-[var(--aqip-primary)]/10 to-[var(--aqip-accent)]/5 border-[var(--aqip-primary)]/20">
+        <div className="flex items-start gap-4">
+          <div className="h-10 w-10 rounded-full bg-[var(--aqip-primary)]/20 flex items-center justify-center shrink-0 mt-1">
+            <Sparkles className="h-5 w-5 text-[var(--aqip-primary)]" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-[var(--aqip-text-primary)] flex items-center gap-2">
+              Analyse du Coach IA
+              <span className="text-[10px] font-medium text-[var(--aqip-accent)] bg-[var(--aqip-accent)]/10 px-2 py-0.5 rounded-full">Personnalisé</span>
+            </h3>
+            <p className="text-xs text-[var(--aqip-text-secondary)] mt-2 leading-relaxed italic">
+              « {getProactiveMessage(agent, incidents)} »
+            </p>
+            <Link to="/coach" className="inline-flex items-center gap-1 mt-3 text-xs font-bold text-[var(--aqip-primary)] hover:underline">
+              Discuter avec mon Coach →
+            </Link>
+          </div>
+        </div>
+      </AQIPCard>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Section 2 — Historique des Incidents */}
         <AQIPCard noPadding>
@@ -142,29 +161,43 @@ export default function DossierAmeliorationPage() {
             Analyse des Compétences
           </h2>
           {gaps.length > 0 ? (
-            <div className="space-y-5">
+            <div className="space-y-6">
               {gaps.map(gap => (
-                <div key={gap.competenceId}>
-                  <div className="flex justify-between items-baseline mb-1.5">
-                    <span className="text-sm font-medium text-white">{gap.competenceLabel}</span>
-                    <span className="text-xs text-aqip-text-muted">Gap : <span className="font-bold text-aqip-danger">{gap.gap} pts</span></span>
+                <div key={gap.competenceId} className="bg-aqip-bg-elevated p-4 rounded-xl border border-aqip-border">
+                  <div className="flex justify-between items-baseline mb-3">
+                    <span className="text-sm font-bold text-white">{gap.competenceLabel}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1">
-                      <AQIPProgress value={gap.niveauActuel} max={5} showValue={false} size="md" color={gap.gap >= 2 ? 'danger' : 'warning'} />
+                  
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="text-center p-2 bg-aqip-bg-surface rounded-lg">
+                      <div className="text-[10px] uppercase tracking-wider text-aqip-text-muted mb-1">Niveau Actuel</div>
+                      <div className="text-lg font-bold text-white">{gap.niveauActuel}/5</div>
                     </div>
-                    <span className="text-sm font-bold text-white w-16 text-right">{gap.niveauActuel} / {gap.niveauRequis}</span>
+                    <div className="text-center p-2 bg-aqip-bg-surface rounded-lg border border-aqip-primary/20">
+                      <div className="text-[10px] uppercase tracking-wider text-aqip-primary mb-1">Niveau Cible</div>
+                      <div className="text-lg font-bold text-aqip-primary">{gap.niveauRequis}/5</div>
+                    </div>
+                    <div className="text-center p-2 bg-aqip-danger/10 rounded-lg border border-aqip-danger/20">
+                      <div className="text-[10px] uppercase tracking-wider text-aqip-danger mb-1">Écart (Gap)</div>
+                      <div className="text-lg font-bold text-aqip-danger">-{gap.gap} pts</div>
+                    </div>
                   </div>
-                  <div className="mt-1.5 flex flex-wrap gap-1">
-                    {gap.erreursCausantes.map(code => (
-                      <span key={code} className="text-[10px] font-mono bg-aqip-bg-elevated px-1.5 py-0.5 rounded text-aqip-text-muted">{code}</span>
-                    ))}
+
+                  <div className="flex items-center gap-2 text-xs text-aqip-text-muted">
+                    <span className="font-medium">Signaux faibles (Erreurs) :</span>
+                    <div className="flex flex-wrap gap-1">
+                      {gap.erreursCausantes.map(code => (
+                        <span key={code} className="text-[10px] font-mono bg-aqip-bg-surface px-1.5 py-0.5 rounded border border-aqip-border shadow-sm text-white">{code}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center text-aqip-text-muted text-sm py-8">Aucun gap de compétence identifié.</div>
+            <div className="text-center text-aqip-text-muted text-sm py-8 bg-aqip-bg-elevated rounded-xl border border-aqip-border border-dashed">
+              Aucun écart de compétence critique identifié.
+            </div>
           )}
         </AQIPCard>
       </div>

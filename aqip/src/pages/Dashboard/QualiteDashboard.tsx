@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+
 import AQIPStatCard from '../../components/ui/AQIPStatCard';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPScoreRing from '../../components/ui/AQIPScoreRing';
@@ -20,11 +20,10 @@ const TOP_ERRORS = [
 ];
 
 export default function QualiteDashboard() {
-  const { incidents, fetchIncidents, getTotalNonQualityCost } = useIncidentStore();
+  const incidents = useIncidentStore(s => s.getAll());
+const getTotalNonQualityCost = () => incidents.filter(i => i.coutEstime).reduce((s, i) => s + (i.coutEstime || 0), 0);
 
-  useEffect(() => {
-    if (incidents.length === 0) fetchIncidents();
-  }, [incidents.length, fetchIncidents]);
+  
 
   const activeIncidents = incidents.filter(i => i.statut !== 'resolu').length;
 

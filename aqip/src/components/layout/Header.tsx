@@ -1,6 +1,7 @@
-import { Bell, Menu, MessageSquare } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import RoleSwitcher from './RoleSwitcher';
 import ThemeToggle from './ThemeToggle';
+import CoachNotificationCenter from '../ui/CoachNotificationCenter';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -11,7 +12,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     <div className="flex flex-col shrink-0 w-full z-10 shadow-md">
       {/* Top Bar - Solid Premium Blue */}
       <header className="flex h-16 items-center justify-between bg-[#2B5E8D] px-4 sm:px-6 lg:px-8 border-b border-[#2B5E8D]">
-      <div className="flex items-center gap-4 lg:hidden">
+      <div className="flex items-center gap-4">
         <button 
           type="button" 
           onClick={onMenuClick}
@@ -40,18 +41,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center gap-x-3 sm:gap-x-5 lg:gap-x-6 ml-auto">
         <ThemeToggle />
 
-        <button type="button" className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#2B5E8D] bg-white hover:bg-gray-50 rounded-full transition-all shadow-sm">
-          <MessageSquare className="h-4 w-4" />
-          <span className="hidden sm:inline">Coach IA</span>
-        </button>
-        
-        <button type="button" className="p-2 text-white/80 hover:text-white rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-white/50">
-          <span className="sr-only">Voir les notifications</span>
-          <Bell className="h-6 w-6" aria-hidden="true" />
-          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm border-2 border-[#2B5E8D]">
-            3
-          </span>
-        </button>
+        <CoachNotificationCenter />
 
         {/* Separator */}
         <div className="hidden lg:block lg:h-8 lg:w-px lg:bg-white/30" aria-hidden="true" />

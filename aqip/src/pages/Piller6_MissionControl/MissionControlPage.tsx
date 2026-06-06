@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, RotateCcw, Activity, ShieldAlert, GraduationCap, CheckCircle, TrendingUp, AlertTriangle } from 'lucide-react';
 

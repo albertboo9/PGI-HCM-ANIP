@@ -7,3 +7,4 @@ export * from './satisfaction.types';
 export * from './budget.types';
 export * from './rh.types';
 export * from './iqsp.types';
+export * from './notification.types';

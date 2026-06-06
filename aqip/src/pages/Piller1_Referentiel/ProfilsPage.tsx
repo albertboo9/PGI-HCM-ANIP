@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPTable from '../../components/ui/AQIPTable';
 import AQIPAvatar from '../../components/ui/AQIPAvatar';
@@ -7,11 +7,9 @@ import { useAgentStore } from '../../store/agentStore';
 import { Search, Filter } from 'lucide-react';
 
 export default function ProfilsPage() {
-  const { agents, fetchAgents, isLoading } = useAgentStore();
+  const agents = useAgentStore(s => s.getAll());
 
-  useEffect(() => {
-    fetchAgents();
-  }, [fetchAgents]);
+  
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -41,7 +39,7 @@ export default function ProfilsPage() {
           data={agents}
           keyExtractor={(row) => row.id}
           onRowClick={(row) => console.log('View Agent', row.id)}
-          emptyMessage={isLoading ? "Chargement des agents..." : "Aucun agent trouvé."}
+          emptyMessage={"Aucun agent trouvé."}
           columns={[
             { 
               header: 'Agent', 

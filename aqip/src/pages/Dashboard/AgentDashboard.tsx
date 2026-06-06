@@ -1,27 +1,40 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+
 import { Link } from 'react-router-dom';
 import AQIPCard from '../../components/ui/AQIPCard';
 import AQIPScoreRing from '../../components/ui/AQIPScoreRing';
 import AQIPButton from '../../components/ui/AQIPButton';
-import { BookOpen, Target, CheckCircle2, TrendingUp, PlayCircle, ShieldCheck, RefreshCw } from 'lucide-react';
+import { BookOpen, Target, CheckCircle2, TrendingUp, ShieldCheck, RefreshCw, Sparkles, MessageCircle, ArrowRight } from 'lucide-react';
 import { useIncidentStore } from '../../store/incidentStore';
 import { useAuthStore } from '../../store/authStore';
 import { useAgentStore } from '../../store/agentStore';
 import { getAgentSkillGaps, getRecommendedFormations } from '../../services/skillEngine';
+import { getProactiveMessage } from '../../services/coachEngine';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 
 export default function AgentDashboard() {
-  const { incidents, fetchIncidents } = useIncidentStore();
   const { currentUser } = useAuthStore();
-  const { agents, fetchAgents, isLoading: agentsLoading } = useAgentStore();
+  const agents = useAgentStore(s => {
+    if (s.agents.length === 0) s.getAll();
+    return s.agents;
+  });
+  const incidents = useIncidentStore(s => {
+    if (s.incidents.length === 0) s.getAll();
+    return s.incidents;
+  });
 
-  const agentId = currentUser?.id || 'agt-001';
-
-  useEffect(() => {
-    fetchIncidents();
-    fetchAgents();
-  }, [fetchIncidents, fetchAgents]);
+  // Mapping: les utilisateurs (usr-xxx) sont liés aux agents (agt-xxx)
+  const userIdToAgentId: Record<string, string> = {
+    'usr-005': 'agt-001',
+    'usr-007': 'agt-006',
+    'usr-008': 'agt-002',
+    'usr-009': 'agt-007',
+    'usr-010': 'agt-004',
+    'usr-011': 'agt-005',
+    'usr-012': 'agt-003',
+  };
+  const agentId = userIdToAgentId[currentUser?.id || ''] || 'agt-001';
 
   const agent = agents.find(a => a.id === agentId);
   const agentIncidents = useMemo(() =>
@@ -41,7 +54,7 @@ export default function AgentDashboard() {
 
   const compositeScore = agent?.scores?.composite ?? 95;
 
-  if (agentsLoading && !agent) {
+  if (!agent) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <RefreshCw className="h-8 w-8 text-aqip-primary animate-spin" />
@@ -147,29 +160,72 @@ export default function AgentDashboard() {
             </AQIPCard>
           </motion.div>
 
+          {/* COACH IA — Message Proactif */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
-            <AQIPCard className="shadow-[var(--aqip-shadow-md)] bg-[var(--aqip-primary)]/5 border-[var(--aqip-primary)]/20">
-              <h2 className="text-sm font-bold text-aqip-primary uppercase tracking-wide border-b border-aqip-primary/20 pb-2 mb-4 flex items-center gap-2">
-                <BookOpen className="h-4 w-4" /> Recommandation IA
+            <AQIPCard className="shadow-[var(--aqip-shadow-md)] bg-gradient-to-br from-[var(--aqip-primary)]/10 to-[var(--aqip-accent)]/5 border-[var(--aqip-primary)]/30">
+              <h2 className="text-sm font-bold text-[var(--aqip-primary)] uppercase tracking-wide border-b border-[var(--aqip-primary)]/20 pb-2 mb-4 flex items-center gap-2">
+                <Sparkles className="h-4 w-4" /> Votre Coach IA
               </h2>
-              {formations.length > 0 ? (
-                <div className="space-y-3">
-                  {formations.slice(0, 2).map(f => (
-                    <div key={f.formationId} className="bg-[var(--aqip-bg-surface)] p-3 rounded-xl border border-aqip-border shadow-sm">
-                      <h3 className="text-sm font-bold text-aqip-text-primary">{f.formationLabel}</h3>
-                      <p className="text-xs text-aqip-text-muted mt-1">{f.duree} — {f.type}</p>
+              
+              {/* Message proactif du Coach */}
+              <div className="bg-[var(--aqip-bg-surface)] p-4 rounded-xl border border-[var(--aqip-border)] shadow-sm mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-[var(--aqip-primary)]/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <Sparkles className="h-4 w-4 text-[var(--aqip-primary)]" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-[var(--aqip-text-secondary)] leading-relaxed italic">
+                      « {getProactiveMessage(agent, incidents)} »
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gaps urgents */}
+              {gaps.length > 0 && (
+                <div className="space-y-3 mb-4">
+                  {gaps.slice(0, 2).map(gap => (
+                    <div key={gap.competenceId} className="bg-[var(--aqip-bg-surface)] p-3 rounded-xl border border-[var(--aqip-border)] shadow-sm hover:border-[var(--aqip-primary)]/40 transition-colors group">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-bold text-[var(--aqip-text-primary)]">{gap.competenceLabel}</h3>
+                        <span className="text-[10px] font-bold text-[var(--aqip-danger)] bg-[var(--aqip-danger)]/10 px-2 py-0.5 rounded-full">
+                          Gap: -{gap.gap} pts
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-[10px] text-[var(--aqip-text-muted)]">
+                        <span>Actuel: <strong className="text-[var(--aqip-text-primary)]">{gap.niveauActuel}/5</strong></span>
+                        <span className="text-[var(--aqip-border)]">→</span>
+                        <span>Cible: <strong className="text-[var(--aqip-primary)]">{gap.niveauRequis}/5</strong></span>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {gap.erreursCausantes.map(code => (
+                          <span key={code} className="text-[9px] font-mono bg-[var(--aqip-bg-elevated)] px-1.5 py-0.5 rounded text-[var(--aqip-text-muted)]">{code}</span>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="bg-[var(--aqip-bg-surface)] p-3 rounded-xl border border-aqip-border shadow-sm mb-4">
-                  <h3 className="text-sm font-bold text-aqip-text-primary">Module: Langue Française</h3>
-                  <p className="text-xs text-aqip-text-muted mt-1">Suite aux erreurs récentes (FR-01), ce module de 30min vous est suggéré.</p>
+              )}
+
+              {formations.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  <div className="text-[10px] font-bold text-[var(--aqip-text-muted)] uppercase tracking-wider">Formations recommandées</div>
+                  {formations.slice(0, 2).map(f => (
+                    <div key={f.formationId} className="flex items-center gap-3 bg-[var(--aqip-bg-surface)] p-2.5 rounded-xl border border-[var(--aqip-border)] shadow-sm">
+                      <BookOpen className="h-4 w-4 text-[var(--aqip-primary)] shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[var(--aqip-text-primary)] truncate">{f.formationLabel}</p>
+                        <p className="text-[10px] text-[var(--aqip-text-muted)]">{f.duree} — Impact: <span className="text-[var(--aqip-accent)] font-bold">-{f.impactPourcentage}%</span> erreurs</p>
+                      </div>
+                      <ArrowRight className="h-3 w-3 text-[var(--aqip-text-muted)] shrink-0" />
+                    </div>
+                  ))}
                 </div>
               )}
-              <Link to="/formations/catalogue" className="block mt-4">
+
+              <Link to="/coach" className="block">
                 <AQIPButton variant="primary" className="w-full justify-center gap-2">
-                  <PlayCircle className="h-4 w-4" /> Voir le catalogue
+                  <MessageCircle className="h-4 w-4" /> Parler avec mon Coach
                 </AQIPButton>
               </Link>
             </AQIPCard>
