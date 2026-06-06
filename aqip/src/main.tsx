@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { ToasterProvider } from './components/ui/AQIPToaster'
 import { useDataStore } from './data/dataStore'
 
 // 🔥 Initialiser les données mockées au démarrage de l'application
@@ -31,6 +32,8 @@ if (data) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ToasterProvider>
+      <App />
+    </ToasterProvider>
   </StrictMode>,
 )

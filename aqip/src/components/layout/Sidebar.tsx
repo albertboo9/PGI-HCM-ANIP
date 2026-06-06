@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { 
-  LayoutDashboard, AlertTriangle, Users, BrainCircuit, PlayCircle,
+  LayoutDashboard, AlertTriangle, BrainCircuit, PlayCircle,
   Network, MessageSquare, TrendingUp,
   ShieldAlert, Settings, Briefcase, ChevronDown, ChevronRight,
   Target, FileText, PenTool, Search, X, Library,
-  BookOpen, Award, Map, BarChart3, UserCheck, DollarSign, HeartHandshake, Sparkles
+  Map, BarChart3, UserCheck, DollarSign, HeartHandshake, Sparkles
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useState, useMemo } from 'react';
@@ -35,16 +35,16 @@ const getNavigationGroups = (role: Role, notificationsNonLues?: number): NavGrou
         name: 'Mon Espace',
         items: [
           { name: 'Tableau de bord', to: '/dashboard', icon: LayoutDashboard },
-          { name: 'Mon Coach IA', to: '/ia', icon: BrainCircuit, badge: 1 },
           { name: 'Espace de Travail', to: '/workspace', icon: PenTool },
         ]
       },
       {
-        name: 'Mes Formations',
+        name: 'Développement',
         items: [
+          { name: 'Mon Coach IA', to: '/coach', icon: Sparkles, badge: 1 },
+          { name: 'Mon Évolution', to: '/lms/evolution', icon: TrendingUp },
+          { name: 'Dossier d\'Amélioration', to: '/agent/usr-005/dossier', icon: FileText },
           { name: 'Catalogue Formations', to: '/formations/catalogue', icon: Library },
-          { name: 'Mes Formations', to: '/excellence/lms', icon: BookOpen },
-          { name: 'Mes Certifications', to: '/excellence/certifications', icon: Award },
         ]
       },
       {
@@ -70,19 +70,17 @@ const getNavigationGroups = (role: Role, notificationsNonLues?: number): NavGrou
         ]
       },
       {
-        name: 'Supervision',
+        name: 'Qualité',
         items: [
-          { name: 'Mon Équipe', to: '/rh/organigramme', icon: Users },
-          { name: 'Incidents', to: '/incidents', icon: AlertTriangle, badge: notificationsNonLues },
-          { name: 'Satisfaction Citoyen', to: '/satisfaction', icon: HeartHandshake },
+          { name: 'Workflow Qualité', to: '/qualite/workflow', icon: TrendingUp },
+          { name: 'Journal Incidents', to: '/incidents', icon: AlertTriangle, badge: notificationsNonLues },
         ]
       },
       {
         name: 'Développement',
         items: [
-          { name: 'Assistant IA', to: '/ia', icon: BrainCircuit },
+          { name: 'Coach Équipe', to: '/coach', icon: Sparkles },
           { name: 'Formations Équipe', to: '/formations/catalogue', icon: Library },
-          { name: 'Maturité Centre', to: '/maturite', icon: BarChart3 },
         ]
       },
     ];
@@ -163,7 +161,8 @@ const getNavigationGroups = (role: Role, notificationsNonLues?: number): NavGrou
       {
         name: 'Performance',
         items: [
-          { name: 'Cartographie Nationale', to: '/qualite/centres', icon: Map },
+          { name: 'Carte Nationale des Compétences', to: '/competency-map', icon: Map },
+          { name: 'Cartographie Nationale', to: '/qualite/centres', icon: TrendingUp },
           { name: 'Scores Nationaux', to: '/intelligence/scores', icon: TrendingUp },
           { name: 'ROI Formations', to: '/pilotage/command-center', icon: DollarSign },
         ]
@@ -216,8 +215,8 @@ const getNavigationGroups = (role: Role, notificationsNonLues?: number): NavGrou
         name: 'Qualité',
         items: [
           { name: 'Tableau de bord', to: '/dashboard', icon: LayoutDashboard },
-          { name: 'Incidents', to: '/incidents', icon: AlertTriangle },
-          { name: 'Erreurs & Analyse', to: '/qualite/erreurs', icon: PenTool },
+          { name: 'Workflow Qualité', to: '/qualite/workflow', icon: TrendingUp },
+          { name: 'Journal Incidents', to: '/incidents', icon: AlertTriangle },
         ]
       },
       {
@@ -341,9 +340,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                       <NavLink
                         to={item.to}
                         onClick={() => {
-                          if (window.innerWidth < 1024 && onClose) {
-                            onClose();
-                          }
+                          if (onClose) onClose();
                         }}
                         className={({ isActive }) =>
                           clsx(

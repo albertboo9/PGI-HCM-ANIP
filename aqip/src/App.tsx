@@ -16,10 +16,14 @@ import IncidentDetail from './pages/Piller2_Qualite/IncidentDetail';
 import ErreursPage from './pages/Piller2_Qualite/ErreursPage';
 import CentresPage from './pages/Piller2_Qualite/CentresPage';
 import ObservatoireDonneesPage from './pages/Piller2_Qualite/ObservatoireDonneesPage';
+import QualityWorkflowPage from './pages/Quality/QualityWorkflowPage';
+import CentrePage from './pages/Quality/CentrePage';
+import SuccessStoriesPage from './pages/Intelligence/SuccessStoriesPage';
+import CompetencyMapPage from './pages/Intelligence/CompetencyMapPage';
 
 // Pilier 3 : Intelligence
-import IAPage from './pages/Piller3_Intelligence/IAPage';
 import ScoresPage from './pages/Piller3_Intelligence/ScoresPage';
+import CoachPage from './pages/Coach/CoachPage';
 
 // Pilier 4 : Excellence
 import LMSPage from './pages/Piller4_Excellence/LMSPage';
@@ -51,6 +55,8 @@ import DossierAmeliorationPage from './pages/Agent/DossierAmeliorationPage';
 
 // Catalogue Formations (Nouveau)
 import CataloguePage from './pages/Formations/CataloguePage';
+import MonEvolutionPage from './pages/LMS/MonEvolutionPage';
+import FormationDetailPage from './pages/Formations/FormationDetailPage';
 
 function App() {
   return (
@@ -74,9 +80,14 @@ function App() {
           <Route path="qualite/erreurs" element={<ErreursPage />} />
           <Route path="qualite/centres" element={<CentresPage />} />
           <Route path="qualite/observatoire" element={<ObservatoireDonneesPage />} />
+          <Route path="qualite/workflow" element={<QualityWorkflowPage />} />
+          <Route path="qualite/centre" element={<CentrePage />} />
+          <Route path="success-stories" element={<SuccessStoriesPage />} />
+          <Route path="competency-map" element={<CompetencyMapPage />} />
 
           {/* Pilier 3 */}
-          <Route path="ia" element={<IAPage />} />
+          <Route path="coach" element={<CoachPage />} />
+          <Route path="mon-evolution" element={<MonEvolutionPage />} />
           <Route path="intelligence/scores" element={<ScoresPage />} />
           
           {/* Pilier 4 */}
@@ -103,6 +114,8 @@ function App() {
 
           {/* Catalogue Formations (Accessible par tous) */}
           <Route path="formations/catalogue" element={<CataloguePage />} />
+          <Route path="formations/:formationId" element={<FormationDetailPage />} />
+          <Route path="certificats" element={<CataloguePage />} />
           <Route path="documents" element={<CataloguePage />} />
 
           {/* Catch-all */}

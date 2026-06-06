@@ -33,4 +33,11 @@ export interface Incident {
   formationPrescrite?: string;
   scoreConfianceIA?: number;
   historique?: IncidentHistorique[];
+
+  // Champs Workflow Qualité V3.5
+  qualificationStatus?: 'constat' | 'cause_identifiee' | 'action_decidee' | 'accompagnement' | 'amelioration_observee';
+  causeRacine?: 'competence' | 'materiel' | 'procedure' | 'surcharge' | null;
+  canalDetection?: 'controleur' | 'chef_centre' | 'systeme' | 'citoyen';
+  actionCorrective?: string | null;
+  pdiId?: string | null;
 }
